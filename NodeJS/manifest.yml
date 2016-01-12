@@ -1,7 +1,7 @@
 applications:
 - disk_quota: 512M
-  host: drctest
-  name: drctest
+  host: 
+  name: 
   command: node .
   instances: 1
   memory: 1024M
