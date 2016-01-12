@@ -1,0 +1,29 @@
+PODS:
+  - Bolts (1.6.0):
+    - Bolts/AppLinks (= 1.6.0)
+    - Bolts/Tasks (= 1.6.0)
+  - Bolts/AppLinks (1.6.0):
+    - Bolts/Tasks
+  - Bolts/Tasks (1.6.0)
+  - Facebook-iOS-SDK (3.24.1):
+    - Bolts (~> 1.2)
+  - IMFCore (1.0.11)
+  - IMFFacebookAuthentication (1.0.11):
+    - Facebook-iOS-SDK (~> 3.19)
+    - IMFCore (~> 1.0.0)
+  - IMFPush (1.0.0):
+    - IMFCore (~> 1.0.0)
+
+DEPENDENCIES:
+  - IMFCore
+  - IMFFacebookAuthentication
+  - IMFPush
+
+SPEC CHECKSUMS:
+  Bolts: f52a250053bb517ca874523c3913776359ab3def
+  Facebook-iOS-SDK: 08689c2690dc4e087b9c8e171e48667608b72a2a
+  IMFCore: 6a28c4a777819b9f957bf8c2644e3ebf72f2ccb6
+  IMFFacebookAuthentication: 5c4ef45a089ca99909bedcf80940d252fe72b481
+  IMFPush: 40412a5cc2b4cd9e6db9034d58d0eaa16f0d0f58
+
+COCOAPODS: 0.39.0.rc.1
