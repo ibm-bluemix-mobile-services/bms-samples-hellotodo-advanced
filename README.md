@@ -12,6 +12,7 @@ Before you start, make sure that you have:
 * Google Cloud Messaging (GCM) credentials. To obtain your GCM credentials, follow the instructions at  
 https://www.ng.bluemix.net/docs/services/mobilepush/t_push_config_provider_android.html
 * iOS provisioning stuff?
+* Facebook app stuff?
 
 
 ### Configure the helloTodo-Advanced sample
@@ -63,9 +64,9 @@ The helloTodoAvanced application requires custom code to be deployed to the Node
 
 [Custom Node.js code](https://github.com/ibm-bluemix-mobile-services/bms-samples-hellotodo-advanced/blob/master/NodeJS/server/server.js)
 
-Deploying the applicaiton:
-1. Edit `manifest.yml` file. Change the `host` property to some unique value. It is currently empty in the provided `manifest.yml`.
-2. Edit `manifest.yml` file and add the services section. Add the Mobile Client Access service instance name created in previous steps. Final result should look like this.
+Deploying the applicaiton:  
+1. Edit `manifest.yml` file. Change the `host` property to some unique value. It is currently empty in the provided `manifest.yml`.  
+2. Edit `manifest.yml` file and add the services section. Add the Mobile Client Access service instance name created in previous steps. Final result should look like this.  
 
 ![image](updated-manifest.png) 
 
@@ -120,7 +121,7 @@ return YES;
 
 Android:  
 
-1. In Android Studio, open the helloPush Android project.
+1. In Android Studio, open the helloTodoAdvanced Android project.
 2. Run a Gradle sync (usually starts automatically) to import the required `core` and `push` SDKs. You can view the **build.gradle** file in the following directory:
 
 	`helloTodoAdvanced\app\build.gradle`
@@ -177,7 +178,7 @@ For the helloTodoAdvanced sample, you will need to make sure your Google Play pa
 iOS:  
 In Xcode, click **Product > Run**.  
 
-Android:
+Android:  
 In Android click run and select a device.
 
 
