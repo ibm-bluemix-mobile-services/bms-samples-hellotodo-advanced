@@ -19,7 +19,7 @@ Use the following steps to configure the helloTodo-Advanced sample:
 2. [Configure the mobile backend for your helloTodoAdvanced application](#configure-the-mobile-backend-for-your-hellotodoadvanced-application)
 3. [Configure the Mobile Client Access service](#configure-the-mobile-client-access-service)
 4. [Configure the IBM Push Notifications service](#configure-the-ibm-push-notifications-service)
-5. [Deploy the custom Node.js application to Bluemix](#deploy-the-custom-node.js-application-to-bluemix)
+5. [Deploy the custom Node application to Bluemix](#deploy-the-custom-node-application-to-bluemix)
 6. [Configure the front end in the helloTodoAdvanced sample](#configure-the-front-end-in-the-hellotodoadvanced-sample)
 7. [Run the helloTodoAdvanced sample application](#run-the-hellotodoadvanced-sample-application)
 
@@ -54,11 +54,11 @@ Before you can run the helloTodoAdvanced application, you must set up a mobile b
 
 > **Tip:** Click the **View API Reference** button on web UI to see the API specs.
 
-### Deploy the custom Node.js application to Bluemix
+### Deploy the custom Node application to Bluemix
 
 The helloTodoAvanced application requires custom code to be deployed to the Node.js application running on Bluemix. This code handles protecting specific endpoints with MCA, such as deleting an item from the list. Also provided in the custom Node.js code is a function that handles sending Push notifications to all registered devices when an item has been marked as completed. You can look more into this custom code here:
 
-```https://github.com/ibm-bluemix-mobile-services/bms-samples-hellotodo-advanced/blob/master/NodeJS/server/server.js```
+[Custom Node.js code](https://github.com/ibm-bluemix-mobile-services/bms-samples-hellotodo-advanced/blob/master/NodeJS/server/server.js)
 
 Deploying the applicaiton:
 1. Edit `manifest.yml` file. Change the `host` property to some unique value. It is currently empty in the provided `manifest.yml`.
@@ -73,14 +73,6 @@ Deploying the applicaiton:
 5. Your Bluemix application should be available at `https//{hostname-from-manifest.yml}.mybluemix.net`
 
 
-### Configure IBM Push Notifications service
-
-iOS:
-1.	In the IBM Push Notifications Dashboard, go to the **Configuration** tab to configure your Push Notification Service.  
-2.  In the Apple Push Certificate section, select the Sandbox environment
-3.  Upload a valid APNs enabled push certificate (.p12 file), then enter the password associated with the certificate.
-
-Android:
 
 ### Configure the Mobile Client Access service
 
@@ -88,6 +80,14 @@ Android:
 2.  Choose your authentication type (this sample has been configured for Facebook authentication).
 3.  Enter the required configuration settings (APP ID for Facebook authentication).
 
+### Configure the IBM Push Notifications service
+
+iOS:
+1.	In the IBM Push Notifications Dashboard, go to the **Configuration** tab to configure your Push Notification Service.  
+2.  In the Apple Push Certificate section, select the Sandbox environment
+3.  Upload a valid APNs enabled push certificate (.p12 file), then enter the password associated with the certificate.
+
+Android:
 
 ### Configure the front end in the helloTodoAdvanced sample
 
@@ -131,7 +131,7 @@ Update URL Types, Item 0, URL Schemes, update Item 0 as follows:
 Android:
 
 
-### Run the helloTodoAdvancedsample application
+### Run the helloTodoAdvanced sample application
 
 iOS:
 In Xcode, click **Product > Run**.  
