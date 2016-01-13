@@ -9,6 +9,9 @@ Before you start, make sure that you have:
 * A [Bluemix](http://bluemix.net) account
 * XCode Version 7.1
 * Android Studio
+* Google Cloud Messaging (GCM) credentials. To obtain your GCM credentials, follow the instructions at  
+https://www.ng.bluemix.net/docs/services/mobilepush/t_push_config_provider_android.html
+* iOS provisioning stuff?
 
 
 ### Configure the helloTodo-Advanced sample
@@ -87,7 +90,9 @@ iOS:
 2.  In the Apple Push Certificate section, select the Sandbox environment.  
 3.  Upload a valid APNs enabled push certificate (.p12 file), then enter the password associated with the certificate.  
 
-Android:
+Android:  
+1. In the IBM Push Notifications Dashboard, go to the **Configuration** tab to configure your Push Notification Service.  
+2. Scroll down to the **Google Cloud Messaging** section. Enter your GCM project credentials, project number (Sender ID) and API key, and click **save**.  
 
 ### Configure the front end in the helloTodoAdvanced sample
 
@@ -113,7 +118,37 @@ return YES;
 }
 ```
 
-Android:
+Android:  
+
+1. In Android Studio, open the helloPush Android project.
+2. Run a Gradle sync (usually starts automatically) to import the required `core` and `push` SDKs. You can view the **build.gradle** file in the following directory:
+
+	`helloTodoAdvanced\app\build.gradle`
+	
+3. Open the `MainActivity.java` class.
+4. In the application `onCreate` method, add the corresponding `ApplicationRoute` and `ApplicationID`:
+
+
+```Java
+	@Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+		...
+		
+        try {
+            //initialize SDK with IBM Bluemix application ID and route
+            //TODO: Please replace <APPLICATION_ROUTE> with a valid ApplicationRoute and <APPLICATION_ID> with a valid ApplicationId
+            BMSClient.getInstance().initialize(this, "<APPLICATION_ROUTE>", "<APPLICATION_ID>");
+        }
+        catch (MalformedURLException mue) {
+            ....
+        }
+```
+
+> **Note**: This sample depends on 1.+ version of the Core SDK. This means that the most recent 1.* version will be downloaded automatically. When creating a production applications it is recommended to define the version explicitly (1.0.0 for example) to ensure consistent builds.
+
 
 ### Setting up Facebook authentication
 
@@ -130,6 +165,12 @@ Update URL Types, Item 0, URL Schemes, update Item 0 as follows:
 
 Android:
 
+Navigate to the strings.xml (`Android\helloTodoAdvanced\bluelist\app\src\main\res\values\strings.xml`) and enter the Facebook AppId to the ```facebook_app_id``` value.
+
+[Learn more about using Facebook as an identity provider](https://www.ng.bluemix.net/docs/services/mobileaccess/security/facebook/t_fb_config.html)    
+
+For the helloTodoAdvanced sample, you will need to make sure your Google Play package name in your Facebook app is `com.ibm.helloTodoAdvanced` and that your class name is `com.ibm.helloTodoAdvanced.MainActivity`.
+
 
 ### Run the helloTodoAdvanced sample application
 
@@ -137,6 +178,7 @@ iOS:
 In Xcode, click **Product > Run**.  
 
 Android:
+In Android click run and select a device.
 
 
 The helloTodoAdvanced sample is a single view application with a simple list of to do items. If you previously added data through your web application, you will see the data is automatically pulled into the application.  
