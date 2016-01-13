@@ -1,6 +1,6 @@
 # helloTodoAdvanced Sample Application for Bluemix Mobile Services
 ---
-This helloTodoAdvanced sample app contains an Objective-C project, an Android project, and a Node.js applicaiton that communicates with a StrongLoop-based mobile backend that was created with the MobileFirst Services Starter Boilerplate on IBM&reg; Bluemix&reg;. It extends the original helloTodo application to include authentication using Mobile Client Access and Facebook, as well as Push Notifications using IBM Push Notifications and a Node.js implementation.2
+This helloTodoAdvanced sample app contains an Objective-C project, an Android project, and a Node.js application that communicates with a StrongLoop-based mobile backend created with the MobileFirst Services Starter Boilerplate on IBM&reg; Bluemix&reg;. It extends the original helloTodo application to include authentication using Mobile Client Access and Facebook, along with a Node.js modification to securely send Push Notifications using IBM Push Notifications.
 
 
 
@@ -82,26 +82,26 @@ Deploying the applicaiton:
 
 ### Configure the IBM Push Notifications service
 
-iOS:
+iOS:  
 1.	In the IBM Push Notifications Dashboard, go to the **Configuration** tab to configure your Push Notification Service.  
-2.  In the Apple Push Certificate section, select the Sandbox environment
-3.  Upload a valid APNs enabled push certificate (.p12 file), then enter the password associated with the certificate.
+2.  In the Apple Push Certificate section, select the Sandbox environment.  
+3.  Upload a valid APNs enabled push certificate (.p12 file), then enter the password associated with the certificate.  
 
 Android:
 
 ### Configure the front end in the helloTodoAdvanced sample
 
-iOS:
-1. In a terminal, navigate to the `bms-samples-hellotodo-advanced` directory where the project was cloned.
-2. Navigate to the `iOS` folder.
-3. If the CocoaPods client is not installed, run the following command: `sudo gem install cocoapods`
-4. If the CocoaPods repository is not configured, run the following command: `pod setup`
-5. To download and install the required dependencies, run the following commmand: `pod install`
-6. Open the Xcode workspace: `open helloToDoAdvanced.xcworkspace`. From now on, open the xcworkspace file because it contains all the dependencies and configuration.
-7. Open the `helloToDoAdvanced/AppDelegate.m` file and add the corresponding **ApplicationRoute** and
-**ApplicationID** values (found in the **Mobile Options** link on the Bluemix Dashboard) in the application `didFinishLaunchingWithOptions` method:
+iOS:  
+1. In a terminal, navigate to the `bms-samples-hellotodo-advanced` directory where the project was cloned.  
+2. Navigate to the `iOS` folder.  
+3. If the CocoaPods client is not installed, run the following command: `sudo gem install cocoapods`  
+4. If the CocoaPods repository is not configured, run the following command: `pod setup`  
+5. To download and install the required dependencies, run the following commmand: `pod install`  
+6. Open the Xcode workspace: `open helloToDoAdvanced.xcworkspace`. From now on, open the xcworkspace file because it contains all the dependencies and configuration.  
+7. Open the `helloToDoAdvanced/AppDelegate.m` file and add the corresponding **ApplicationRoute** and  
+**ApplicationID** values (found in the **Mobile Options** link on the Bluemix Dashboard) in the application `didFinishLaunchingWithOptions` method:  
 
-```objective-c
+```objective-c  
 (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
 //initialize SDK with IBM Bluemix application ID and route
@@ -117,15 +117,15 @@ Android:
 
 ### Setting up Facebook authentication
 
-iOS:
-Update the `Info.plist` file with your Facebook App information:
+iOS:  
+Update the `Info.plist` file with your Facebook App information:  
 
-- **FacebookAppID** (For example `1581349575427190`): You can get the App ID from the Facebook developer console.
-- **FacebookDisplayName** (For example `helloAuth`): You can get App name from Facebook developer console.
+- **FacebookAppID** (For example `1581349575427190`): You can get the App ID from the Facebook developer console.  
+- **FacebookDisplayName** (For example `helloAuth`): You can get App name from Facebook developer console.  
 
-Update URL Types, Item 0, URL Schemes, update Item 0 as follows:
+Update URL Types, Item 0, URL Schemes, update Item 0 as follows:  
 
-- **URL Schemes**: (for example `fb1581349575427190` , fb+Client ID from Facebook developer console)
+- **URL Schemes**: (for example `fb1581349575427190` , fb+Client ID from Facebook developer console)  
 [Learn more about using Facebook as an identity provider](https://www.ng.bluemix.net/docs/#docs/services/mobileaccess/security/facebook/index.html)  
 
 Android:
@@ -133,25 +133,25 @@ Android:
 
 ### Run the helloTodoAdvanced sample application
 
-iOS:
+iOS:  
 In Xcode, click **Product > Run**.  
 
 Android:
 
 
-The helloTodoAdvanced sample is a single view application with a simple list of to do items. If you previously added data through your web application, you will see the data is automatically pulled into the application.
+The helloTodoAdvanced sample is a single view application with a simple list of to do items. If you previously added data through your web application, you will see the data is automatically pulled into the application.  
 
 #### Modify to do items in the iOS app
-You can create, add and modify items directly in the application. This sample uses Bluemix Mobile Services SDK, which knows how to handle Mobile Client Access security. Therefore, unlike the web application, you can also DELETE items from mobile app by swiping them. You can also mark items as completed by clicking to the left of the corresponding to do item. When you update an item in the mobile app it will automatically be updated in the web app (you need to refresh the web app). If you make a change in the web UI and want to see it reflected in the mobile app, pull down the todo list to refresh.
+You can create, add and modify items directly in the application. This sample uses Bluemix Mobile Services SDK, which knows how to handle Mobile Client Access security. Therefore, unlike the web application, you can also DELETE items from mobile app by swiping them. You can also mark items as completed by clicking to the left of the corresponding to do item. When you update an item in the mobile app it will automatically be updated in the web app (you need to refresh the web app). If you make a change in the web UI and want to see it reflected in the mobile app, pull down the todo list to refresh.  
 
 ### Using Facebook Authentication in the helloTodoAdvanced application
 As you recall, the DELETE endpoint can only be accessed by mobile applications because it is protected by the Mobile Client Access service. Since we have setup MCA with Facebook authentication, login will be required to complete these protected actions. To simplify user experience, the helloTodoAdvanced application required login when the application first loads. 
 
 ### Sending Push notifications to all registered devices
-Custom Node.js code has been provided in this sample that handles sending push notifications to registered devices whenever an helloTodo item it marked complete. This is accomplished in the following manner:
-1. A URL endpoint (<ApplicationRoute>/notifyAllDevices) has been created when the custom Node.js application was deployed to your Bluemix application.
-2. Client side code has been provided (notifyAllDevices function), that handles sending a Post request to our notifyAllDevices endpoint on Bluemix.
-3. When an item is marked as complete, we send the corresponding item information to our Node.js application. Our custom code then creates and sends out a push notification to all registered devices, informing the item has been completed.
+Custom Node.js code has been provided in this sample that handles sending push notifications to registered devices whenever an helloTodo item it marked complete. This is accomplished in the following manner:  
+1. A URL endpoint (<ApplicationRoute>/notifyAllDevices) has been created when the custom Node.js application was deployed to your Bluemix application.  
+2. Client side code has been provided (notifyAllDevices function), that handles sending a Post request to our notifyAllDevices endpoint on Bluemix.  
+3. When an item is marked as complete, we send the corresponding item information to our Node.js application. Our custom code then creates and sends out a push notification to all registered devices, informing the item has been completed.  
 
 **Note:** The /notifyAllDevices endpoint has also been protected by MCA and the Facebook authentication we have configured. You will only be able to send these notifications once you have successfully logged in to Facebook from the client side application.
 
