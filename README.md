@@ -7,13 +7,23 @@ This helloTodoAdvanced sample app contains an Objective-C project, an Android pr
 ### Before you begin
 Before you start, make sure that you have:
 * A [Bluemix](http://bluemix.net) account
+* Facebook Developer Application.  
+[Learn more about using Facebook as an identity provider](https://www.ng.bluemix.net/docs/services/mobileaccess/security/facebook/t_fb_config.html)
+
+
+**iOS:**  
 * XCode Version 7.1
+* Physical iOS device
+* Valid APNs enabled bundle id
+* Provisioning profile
+* Development certificate
+
+> **Note:** For push notifications to work successfully, you must run the helloTodoAdvanced sample on a physical iOS device with a valid APNs enabled bundle id, provisioning profile, and development certificate.
+
+**Android:**  
 * Android Studio
 * Google Cloud Messaging (GCM) credentials. To obtain your GCM credentials, follow the instructions at  
-https://www.ng.bluemix.net/docs/services/mobilepush/t_push_config_provider_android.html
-* iOS provisioning stuff?
-* Facebook app stuff?
-
+[configuring push credentials for GCM](https://www.ng.bluemix.net/docs/services/mobilepush/t_push_config_provider_android.html)
 
 ### Configure the helloTodo-Advanced sample
 
@@ -37,7 +47,7 @@ Clone the sample from Github with the following command:
 
 Before you can run the helloTodoAdvanced application, you must set up a mobile backend for your app on Bluemix.
 
-> If you have already created a mobile backend with the MobileFirst Services Starter boilerplate, you might want to skip to the [Configuring the front end in the helloTodoAdvancedsample](#configuring-the-front-end-in-the-hellotodo-sample) section.
+> If you have already created a mobile backend with the MobileFirst Services Starter boilerplate, you might want to skip to the [Configuring the front end in the helloTodoAdvanced sample](#configuring-the-front-end-in-the-hellotodo-sample) section.
 
   The following procedure shows you how to create a MobileFirst Services Starter application. Using the boilerplate to create your app automatically performs the following actions:
 
@@ -54,7 +64,7 @@ Before you can run the helloTodoAdvanced application, you must set up a mobile b
 #### Access the StrongLoop backend app
 
 1. Open the **appRoute** URL that you copied from the Bluemix dashboard in your browser. You will see the web interface for the helloTodoAdvanced backend.
-2. Start by following the guided experience steps that are described in the web UI. <br/>Eventually, you will try to DELETE a todo item and will discover that this action can only be complete when using the helloTodoAdvancedmobile apps sample from this Github repository.The mobile backend is protected by a Mobile Client Access by default.  Mobile Client Access is a Bluemix service that provides security and monitoring functionality for mobile backend applications.
+2. Start by following the guided experience steps that are described in the web UI. <br/>Eventually, you will try to DELETE a todo item and will discover that this action can only be complete when using the helloTodoAdvanced mobile apps sample from this Github repository.The mobile backend is protected by a Mobile Client Access by default.  Mobile Client Access is a Bluemix service that provides security and monitoring functionality for mobile backend applications.
 
 > **Tip:** Click the **View API Reference** button on web UI to see the API specs.
 
@@ -66,14 +76,10 @@ The helloTodoAvanced application requires custom code to be deployed to the Node
 
 Deploying the applicaiton:  
 1. Edit `manifest.yml` file. Change the `host` property to some unique value. It is currently empty in the provided `manifest.yml`.  
-2. Edit `manifest.yml` file and add the services section. Add the Mobile Client Access service instance name created in previous steps. Final result should look like this.  
-
-![image](updated-manifest.png) 
-
-3. Use `cf push` command to deploy your application to Bluemix, bind it to Mobile Client Access service instance and start it. 
-
-4. Once deployment completes successfully use `cf apps` command to see the list of available applications and their routes
-
+2. Edit `manifest.yml` file and add the services section. Add the Mobile Client Access service instance name created in previous steps. Final result should look like this.    
+![image](updated-manifest.png)  
+3. Use `cf push <Bluemix_Application_Name>` command to deploy your application to Bluemix, bind it to Mobile Client Access service instance and start it.  
+4. Once deployment completes successfully use `cf apps` command to see the list of available applications and their routes  
 5. Your Bluemix application should be available at `https//{hostname-from-manifest.yml}.mybluemix.net`
 
 
@@ -86,18 +92,18 @@ Deploying the applicaiton:
 
 ### Configure the IBM Push Notifications service
 
-iOS:  
+**iOS:**  
 1.	In the IBM Push Notifications Dashboard, go to the **Configuration** tab to configure your Push Notification Service.  
 2.  In the Apple Push Certificate section, select the Sandbox environment.  
 3.  Upload a valid APNs enabled push certificate (.p12 file), then enter the password associated with the certificate.  
 
-Android:  
+**Android:**  
 1. In the IBM Push Notifications Dashboard, go to the **Configuration** tab to configure your Push Notification Service.  
 2. Scroll down to the **Google Cloud Messaging** section. Enter your GCM project credentials, project number (Sender ID) and API key, and click **save**.  
 
 ### Configure the front end in the helloTodoAdvanced sample
 
-iOS:  
+**iOS:**  
 1. In a terminal, navigate to the `bms-samples-hellotodo-advanced` directory where the project was cloned.  
 2. Navigate to the `iOS` folder.  
 3. If the CocoaPods client is not installed, run the following command: `sudo gem install cocoapods`  
@@ -119,7 +125,7 @@ return YES;
 }
 ```
 
-Android:  
+**Android:**  
 
 1. In Android Studio, open the helloTodoAdvanced Android project.
 2. Run a Gradle sync (usually starts automatically) to import the required `core` and `push` SDKs. You can view the **build.gradle** file in the following directory:
@@ -153,7 +159,7 @@ Android:
 
 ### Setting up Facebook authentication
 
-iOS:  
+**iOS:**  
 Update the `Info.plist` file with your Facebook App information:  
 
 - **FacebookAppID** (For example `1581349575427190`): You can get the App ID from the Facebook developer console.  
@@ -162,23 +168,20 @@ Update the `Info.plist` file with your Facebook App information:
 Update URL Types, Item 0, URL Schemes, update Item 0 as follows:  
 
 - **URL Schemes**: (for example `fb1581349575427190` , fb+Client ID from Facebook developer console)  
-[Learn more about using Facebook as an identity provider](https://www.ng.bluemix.net/docs/#docs/services/mobileaccess/security/facebook/index.html)  
 
-Android:
-
+**Android:**  
 Navigate to the strings.xml (`Android\helloTodoAdvanced\bluelist\app\src\main\res\values\strings.xml`) and enter the Facebook AppId to the ```facebook_app_id``` value.
 
-[Learn more about using Facebook as an identity provider](https://www.ng.bluemix.net/docs/services/mobileaccess/security/facebook/t_fb_config.html)    
 
 For the helloTodoAdvanced sample, you will need to make sure your Google Play package name in your Facebook app is `com.ibm.helloTodoAdvanced` and that your class name is `com.ibm.helloTodoAdvanced.MainActivity`.
 
 
 ### Run the helloTodoAdvanced sample application
 
-iOS:  
+**iOS:**  
 In Xcode, click **Product > Run**.  
 
-Android:  
+**Android:**  
 In Android click run and select a device.
 
 
@@ -201,7 +204,7 @@ Custom Node.js code has been provided in this sample that handles sending push n
 
 
 ### Xcode requirement
-**Note:** The project has bitcode support disabled because the Bluemix Mobile Services SDK does not currently support bitcode. For more information, see: [Connect Your iOS 9 App to Bluemix](https://developer.ibm.com/bluemix/2015/09/16/connect-your-ios-9-app-to-bluemix/)
+The project has bitcode support disabled because the Bluemix Mobile Services SDK does not currently support bitcode. For more information, see: [Connect Your iOS 9 App to Bluemix](https://developer.ibm.com/bluemix/2015/09/16/connect-your-ios-9-app-to-bluemix/)
 
 ### License
 This package contains sample code provided in source code form. The samples are licensed under the under the Apache License, Version 2.0 (the "License"). You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 and may also view the license in the license.txt file within this package. Also see the notices.txt file within this package for additional notices.
