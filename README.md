@@ -190,6 +190,8 @@ The helloTodoAdvanced sample is a single view application with a simple list of 
 #### Modify to do items in the iOS app
 You can create, add and modify items directly in the application. This sample uses Bluemix Mobile Services SDK, which knows how to handle Mobile Client Access security. Therefore, unlike the web application, you can also DELETE items from mobile app by swiping them. You can also mark items as completed by clicking to the left of the corresponding to do item. When you update an item in the mobile app it will automatically be updated in the web app (you need to refresh the web app). If you make a change in the web UI and want to see it reflected in the mobile app, pull down the todo list to refresh.  
 
+**David to provide app behavior section for Android**
+
 ### Using Facebook Authentication in the helloTodoAdvanced application
 As you recall, the DELETE endpoint can only be accessed by mobile applications because it is protected by the Mobile Client Access service. Since we have setup MCA with Facebook authentication, login will be required to complete these protected actions. To simplify user experience, the helloTodoAdvanced application required login when the application first loads. 
 
