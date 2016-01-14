@@ -4,14 +4,17 @@ console.log("packageVersion :: " + packageVersion);
 var loopback = require('loopback');
 var boot = require('loopback-boot');
 
+// Library needed to parse through VCAP services
 var bodyParser = require('body-parser');
 
 var request = require('request');
 
 var app = module.exports = loopback();
 
+// Must indicate the use of the bodyParser library in the app server
 app.use(bodyParser.json());
 
+// Grab the push secret and appId directly from VCAP services on Bluemix! Note that Mobile Client Access stores the appId as the clientId value, they are one and the same. 
 try {
         var vcap = JSON.parse(process.env.VCAP_SERVICES);
 		var pushSecret = vcap.imfpush[0].credentials.appSecret;
@@ -44,9 +47,10 @@ app.get('/protected', passport.authenticate('mca-backend-strategy', {session: fa
 	res.send("Hello, this is a protected resource of the mobile backend application!");
 });
 
-// Be sure to protect this from malicious users who want to send tons of push notifications
+// Protect /notifyAllDevices from malicious users who want to send tons of push notifications
 app.post('/notifyAllDevices', passport.authenticate('mca-backend-strategy', {session: false}), function(req, res){
 	
+	// Create JSON body to include the completed task in push notification.
 	var jsonObject = 
 	{
 		"message": {
@@ -54,6 +58,7 @@ app.post('/notifyAllDevices', passport.authenticate('mca-backend-strategy', {ses
 			}
 		};
 	
+	// Formulate and send outbound REST request using the request.js library
 	request({
 		url: "https://mobile.ng.bluemix.net/imfpush/v1/apps/" + appId + "/messages",
 		method: "POST",
@@ -65,11 +70,14 @@ app.post('/notifyAllDevices', passport.authenticate('mca-backend-strategy', {ses
 	}, function (error, response, body){
 		if(!error && response.statusCode == 202){
 			console.log(response.statusCode, "Notified all devices successfully: " + body);
+			// on success, respond to mobile app appropriately
 			res.status(response.statusCode).send({result: "Sent notification to all registered devices.", response: body});
 		}else if(error){
+			// If an error occurred log and send to mobile app
 			console.log("Error from Push Service: " + error);
 			res.status(response.statusCode).send({reason: "An error occurred while sending the Push notification.", error: error});
 		}else{
+			// if no error but something else goes wrong, like no devices are registered, print response and send body to mobile app
 			console.log("An unknown problem occurred, printing response");
 			console.log(response);
 			res.status(response.statusCode).send({reason: "A problem occurred while sending the Push notification.", message: body});
