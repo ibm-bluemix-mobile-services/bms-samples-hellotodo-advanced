@@ -55,6 +55,7 @@ import java.util.List;
 
 /**
  * The {@code MainActivity} is the primary visual activity shown when the app is being interacted with.
+ * The ResponseListener interface is implemented to handle Mobile Client Access Facebook auth and related responses.
  */
 public class MainActivity extends Activity implements ResponseListener {
 
@@ -64,7 +65,7 @@ public class MainActivity extends Activity implements ResponseListener {
     private List<TodoItem> mTodoItemList; // The list of TodoItems
     private TodoItemAdapter mTodoItemAdapter; // Adapter for bridging the list of TodoItems with the ListView
 
-    private SwipeRefreshLayout mSwipeLayout; // Swipe refresh to update local app if backend has changed
+    private SwipeRefreshLayout mSwipeLayout; // Swipe down refresh to update local app if backend has changed
 
     private BMSClient client; // IBM Mobile First Client SDK
 
@@ -73,7 +74,7 @@ public class MainActivity extends Activity implements ResponseListener {
 
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -87,30 +88,37 @@ public class MainActivity extends Activity implements ResponseListener {
             throw new RuntimeException(e);
         }
 
-        FacebookAuthenticationManager.getInstance().register(this);
-
-        AuthorizationManager.getInstance().obtainAuthorizationHeader(this, this);
-
+        //initialize UI
         initListView();
         initSwipeRefresh();
+
+        // initialize Mobile First Push SDK
         initPush();
     }
 
     @Override
-    public void onResume() {
+    protected void onResume() {
         super.onResume();
 
-        AuthorizationManager.getInstance().obtainAuthorizationHeader(this, this);
+        // Calling the auth initalization code in onResume ensures that Facebook authentication is required whener the app is opened
+        initFBAuth();
+    }
 
-        // If the device has been registered previously, ensure the client sdk is still using the notification listener when app is resumed
-        if (push != null) {
-            push.listen(notificationListener);
-        }
+    /**
+     * Handles configuring and starting Facebook authentication
+     */
+    private void initFBAuth(){
+        // Register this ativity to handle Facebook auth response using the ResponseListener interface
+        FacebookAuthenticationManager.getInstance().register(this);
+
+        // Obtaining an authorization header kicks off the Facebok login process, if successful the onSuccess() function is called
+        // Note: if no auth is configured in the Bluemix MCA instance this auth will succeed automatically since it only checks that the request is coming from a Mobile First SDK
+        AuthorizationManager.getInstance().obtainAuthorizationHeader(this, this);
     }
 
 
     /**
-     * Handles response after attempting Facebook
+     * Handles response from Bluemix MCA, kicks off the Facebook login intent, and routes appropriately, this should always be the same depending on the form of auth.
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -119,14 +127,23 @@ public class MainActivity extends Activity implements ResponseListener {
 
     }
 
-    //ResponseListener for FB login
+    /**
+     * Handles successful authentication against MCA. If facebook auth is required, this will be called upon successful login.
+     * @param response HTTP response object from MCA.
+     */
     @Override
     public void onSuccess(Response response) {
-        Log.i(TAG, "Logged into Facebook successfully");
+        Log.i(TAG, "Logged into Facebook successfully: " + response.getResponseText());
 
+        // Register for push notifications and show data now that the user is authenticated
+        registerForPush();
         loadList();
     }
 
+    /**
+     * Handles failing authentication against MCA.
+     * @param response HTTP response object from MCA
+     */
     @Override
     public void onFailure(Response response, Throwable t, JSONObject extendedInfo) {
         if(response != null) {
@@ -140,6 +157,127 @@ public class MainActivity extends Activity implements ResponseListener {
         }
     }
 
+    /**
+     * Initializes the Mobile First Push SDK and creates notification listener to handle incoming push notifications.
+     */
+    private void initPush(){
+        // Initialize Push client
+        push = MFPPush.getInstance();
+
+        push.initialize(this);
+
+        // Create notification listener and enable pop up notification when a message is received
+        // Note: You may see some errors in the logs on notification receipt indicating missing values. These are non-fatal and can be ignored.
+        notificationListener = new MFPPushNotificationListener() {
+            @Override
+            public void onReceive(final MFPSimplePushNotification message) {
+                Log.i(TAG, "Received a Push Notification: " + message.toString());
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        new AlertDialog.Builder(MainActivity.this)
+                                .setTitle("Received a Push Notification")
+                                .setMessage(message.getAlert())
+                                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                        // Make sure most up to date data is displayed when notification is dismissed.
+                                        loadList();
+                                    }
+                                })
+                                .show();
+                    }
+                });
+            }
+        };
+    }
+
+    /**
+     * Registers device for push notifications and, if successful, the Mobile First Push SDK begins using the notification listener (created in initPush) to handle incoming push notifications.
+     */
+    private void registerForPush(){
+        Log.i(TAG, "Registering for push notifications");
+
+        // Creates response listener to handle the response when a device is registered.
+        MFPPushResponseListener registrationResponselistener = new MFPPushResponseListener<String>() {
+            @Override
+            public void onSuccess(String s) {
+                Log.i(TAG, "Successfully registered for push notifications: " + s);
+                push.listen(notificationListener);
+            }
+
+            @Override
+            public void onFailure(MFPPushException e) {
+                Log.e(TAG,"Failed to register for notifications: " + e.getErrorMessage());
+                push = null;
+            }
+        };
+
+        // Attempt to register device using response listener created above
+        push.register(registrationResponselistener);
+    }
+
+    /**
+     * If the device has been registered successfully, hold push notifications when the app is paused.
+     * Note: As soon as push.listen(notificationListener) is called again, the notifications will be released.
+     */
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        if (push != null) {
+            push.hold();
+        }
+    }
+
+    /**
+     * Formulates and sends REST request to the custom Node.js endpoint "<your_bluemix_route>/notifyAllDevices" deployed on Bluemix.
+     * Expect an incoming push notification if configured correctly.
+     * @param completedItem the task completed.
+     */
+    private void notifyAllDevices(String completedItem) {
+
+        Request request = new Request(client.getBluemixAppRoute() + "/notifyAllDevices", Request.POST);
+
+        String json = "{\"text\":\"" + completedItem + "\"}";
+
+        HashMap headers = new HashMap();
+
+        List<String> cType = new ArrayList<>();
+        cType.add("application/json");
+        List<String> accept = new ArrayList<>();
+        accept.add("Application/json");
+
+        headers.put("Content-Type", cType);
+        headers.put("Accept", accept);
+
+        request.setHeaders(headers);
+
+        request.send(getApplicationContext(), json, new ResponseListener() {
+            @Override
+            public void onSuccess(Response response) {
+                Log.i(TAG, "All registered devices notified successfully: " + response.getResponseText());
+            }
+
+            // On failure, log errors
+            @Override
+            public void onFailure(Response response, Throwable t, JSONObject extendedInfo) {
+                if (response != null) {
+                    Log.e(TAG, "Notify all devices failed with response: " + response.getResponseText());
+                }
+                if (t != null) {
+                    Log.e(TAG, "Notify all devices failed with error: " + t.getLocalizedMessage(), t);
+                }
+                if (extendedInfo != null) {
+                    Log.e(TAG, "Notify all devices failed with: " + extendedInfo.toString());
+                }
+            }
+        });
+    }
+
+    /**
+     * Initializes the main list view and sets long click listener for delete.
+     * Note: the Node delete endpoint is protected by MCA and can only be done with an authorized header from the device.
+     * This is handled by the core SDK and will work if Facebook auth succeeded.
+     */
     private void initListView() {
         // Get MainActivity's ListView
         mListView = (ListView) findViewById(R.id.listView);
@@ -265,72 +403,17 @@ public class MainActivity extends Activity implements ResponseListener {
             public void onFailure(Response response, Throwable throwable, JSONObject jsonObject) {
                 if (throwable != null) {
                     Log.e(TAG, "Failed sending request to Bluemix: " + throwable.getLocalizedMessage());
-                }if (response != null) {
+                }
+                if (response != null) {
                     Log.e(TAG, "Failed sending request to Bluemix: " + response.toString());
-                }if (jsonObject != null) {
+                }
+                if (jsonObject != null) {
                     Log.e(TAG, "Failed sending request to Bluemix: " + jsonObject.toString());
                 } else {
                     Log.e(TAG, "Failed sending request to Bluemix: Reason Unkown");
                 }
             }
         });
-    }
-
-    private void initPush(){
-        // Initialize Push client
-        push = MFPPush.getInstance();
-
-        push.initialize(this);
-
-        // Create notification listener and enable pop up notification when a message is received
-        notificationListener = new MFPPushNotificationListener() {
-            @Override
-            public void onReceive(final MFPSimplePushNotification message) {
-                Log.i(TAG, "Received a Push Notification: " + message.toString());
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                        new AlertDialog.Builder(MainActivity.this)
-                                .setTitle("Received a Push Notification")
-                                .setMessage(message.getAlert())
-                                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int whichButton) {
-                                    }
-                                })
-                                .show();
-                    }
-                });
-            }
-        };
-
-        Log.i(TAG, "Registering for notifications");
-
-        // Creates response listener to handle the response when a device is registered.
-        MFPPushResponseListener registrationResponselistener = new MFPPushResponseListener<String>() {
-            @Override
-            public void onSuccess(String s) {
-                Log.i(TAG, "Successfully registered for push notifications");
-                push.listen(notificationListener);
-            }
-
-            @Override
-            public void onFailure(MFPPushException e) {
-                Log.e(TAG,"Failed to register for notifications: " + e.getErrorMessage());
-                push = null;
-            }
-        };
-
-        // Attempt to register device using response listener created above
-        push.register(registrationResponselistener);
-    }
-
-    // If the device has been registered previously, hold push notifications when the app is paused
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        if (push != null) {
-            push.hold();
-        }
     }
 
     /**
@@ -496,6 +579,7 @@ public class MainActivity extends Activity implements ResponseListener {
         });
     }
 
+
     /**
      * Changes completed image and flips TodoItem isDone boolean value. Same request as editTodoName.
      *
@@ -552,46 +636,6 @@ public class MainActivity extends Activity implements ResponseListener {
             }
         });
 
-    }
-
-    public void notifyAllDevices(String completedItem) {
-        Request request = new Request(client.getBluemixAppRoute() + "/notifyAllDevices", Request.POST);
-
-        String json = "{\"text\":\"" + completedItem + "\"}";
-
-        HashMap headers = new HashMap();
-
-        List<String> cType = new ArrayList<>();
-        cType.add("application/json");
-        List<String> accept = new ArrayList<>();
-        accept.add("Application/json");
-
-        headers.put("Content-Type", cType);
-        headers.put("Accept", accept);
-
-        request.setHeaders(headers);
-
-        request.send(getApplicationContext(), json, new ResponseListener() {
-            // On success, update local list with updated TodoItem
-            @Override
-            public void onSuccess(Response response) {
-                Log.i(TAG, "All registered devices notified successfully");
-            }
-
-            // On failure, log errors
-            @Override
-            public void onFailure(Response response, Throwable t, JSONObject extendedInfo) {
-                if (response != null) {
-                    Log.e(TAG, "Notify all devices failed with response: " + response.getResponseText());
-                }
-                if (t != null) {
-                    Log.e(TAG, "Notify all devices failed with error: " + t.getLocalizedMessage(), t);
-                }
-                if (extendedInfo != null) {
-                    Log.e(TAG, "Notify all devices failed with: " + extendedInfo.toString());
-                }
-            }
-        });
     }
 }
 
