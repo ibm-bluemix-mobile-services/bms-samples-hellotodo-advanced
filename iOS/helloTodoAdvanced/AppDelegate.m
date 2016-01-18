@@ -11,6 +11,7 @@
 #import <FacebookSDK/FacebookSDK.h>
 #import <IMFFacebookAuthentication/IMFFacebookAuthenticationHandler.h>
 #import <IMFPush/IMFPush.h>
+#import "ViewController.h"
 
 @interface AppDelegate ()
 
@@ -30,16 +31,9 @@
     // https://developer.apple.com/library/prerelease/ios/releasenotes/General/WhatsNewIniOS/Articles/iOS9.html
     
     IMFClient *imfClient = [IMFClient sharedInstance];
-    [imfClient initializeWithBackendRoute:@"<APPLICATION_ROUTE>" backendGUID:@"<APPLICATION_ID>"];
-    
+    [imfClient initializeWithBackendRoute:@"<Application_ID>" backendGUID:@"<Application_Route"];
     [[IMFFacebookAuthenticationHandler sharedInstance] registerWithDefaultDelegate];
-    
-    //Register for Push
-    [[UIApplication sharedApplication] registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeSound | UIUserNotificationTypeAlert | UIUserNotificationTypeBadge) categories:nil]];
-    //call function to register Push
-    [[UIApplication sharedApplication] registerForRemoteNotifications];
-    
-    return YES;
+      return YES;
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
@@ -93,6 +87,7 @@
     NSString *message = [pushNotification objectForKey:@"body"];
     //show an alert with the push notification contents
     [self showAlert:@"Received a Push Notification" :message];
+
     
 }
 -(void)showAlert:(NSString *) title :(NSString*) message{

@@ -163,10 +163,23 @@
             NSLog(@"%@",error);
         } else {
             NSLog(@"You have obtained the authorization token from Bluemix successfully.");
+            //Register for Push once Login to MCA is succesful
+            [self registerForPush];
         }
-    }];
+        }];
     
 }
+-(void)registerForPush{
+    //Check to see if device is already registered to recieve push notifications
+    if(([[UIApplication sharedApplication] isRegisteredForRemoteNotifications])){
+        NSLog(@"Device is already registered to recieve push notifications");
+    }
+    else{
+        [[UIApplication sharedApplication] registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeSound | UIUserNotificationTypeAlert | UIUserNotificationTypeBadge) categories:nil]];
+        //call function to register Push
+        [[UIApplication sharedApplication] registerForRemoteNotifications];
+    }}
+
 
 
 
