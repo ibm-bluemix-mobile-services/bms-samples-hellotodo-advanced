@@ -4,15 +4,26 @@ This helloTodoAdvanced sample app contains an Objective-C project, an Android pr
 * Authentication with the IBM Mobile Client Access for Bluemix service and Facebook identity provider.
 * Node.js modification to securely send push notifications with the IBM Push Notifications for Bluemix service.
 
-## Before you begin
-You must have:
-* A [Bluemix](http://bluemix.net) account
-* XCode Version 7.1
-* Android Studio
-* Google Cloud Messaging (GCM) credentials. To obtain your GCM credentials, see the [Push documentation](https://www.ng.bluemix.net/docs/services/mobilepush/t_push_config_provider_android.html).
-* iOS provisioning stuff?
-* Facebook app stuff?
-
+### Before you begin
+  Before you start, make sure that you have:
+ * A [Bluemix](http://bluemix.net) account
+ * Facebook Developer Application.  
+ [Learn more about using Facebook as an identity provider](https://www.ng.bluemix.net/docs/services/mobileaccess/security/facebook/t_fb_config.html)
+ 
+ 
+ **iOS:**  
+ * XCode Version 7.1
+ * Physical iOS device
+ * Valid APNs enabled bundle id
+ * Provisioning profile
+ * Development certificate
+ 
+ > **Note:** For push notifications to work successfully, you must run the helloTodoAdvanced sample on a physical iOS device with a valid APNs enabled bundle id, provisioning profile, and development certificate.
+ 
+ **Android:**  
+ * Android Studio
+ * Google Cloud Messaging (GCM) credentials. To obtain your GCM credentials, follow the instructions at  
+[configuring push credentials for GCM](https://www.ng.bluemix.net/docs/services/mobilepush/t_push_config_provider_android.html).
 
 ## Configuring the helloTodoAdvanced sample
 
