@@ -71,26 +71,6 @@ The mobile backend is protected by Mobile Client Access by default.  Mobile Clie
 
 > **Tip:** Click the **View API Reference** button on web UI to see the API specs.
 
-### Deploy the custom Node application to Bluemix
-
-The helloTodoAdvanced sample application requires custom code to be deployed to the Node.js application running on Bluemix. This code:
-* Handles protecting specific endpoints with Mobile Client Access, such as deleting an item from the list.
-* Contains a function that handles sending push notifications to all registered devices when an item has been marked as completed.
-
-To learn more about this custom code, you can view the source: [Custom Node.js code](https://github.com/ibm-bluemix-mobile-services/bms-samples-hellotodo-advanced/blob/master/NodeJS/server/server.js).
-
-#### Deploy the application
-1. Edit `manifest.yml` file. Change the `host` property to a unique value. The value is empty in the provided `manifest.yml` file.  
-2. Edit the `manifest.yml` file and add the services section. Add the Mobile Client Access service instance name that you created in previous steps. For example:  
-
-![image](updated-manifest.png)
-
-3. Run the **cf push** command to deploy your application to Bluemix.   Bind the Node.js app to the Mobile Client Access service instance and start the app.
-
-4. When deployment completes, use the **cf apps** command to see the list of available applications and their routes.
-
-5. Your Bluemix application is available at: `https//{hostname-from-manifest.yml}.mybluemix.net`
-
 
 
 ### Configure the Mobile Client Access service
@@ -110,6 +90,27 @@ To learn more about this custom code, you can view the source: [Custom Node.js c
 #### Android:  
 1. In the Push Notifications dashboard, go to the **Configuration** tab to configure your Push Notification service.  
 2. Scroll down to the **Google Cloud Messaging** section. Enter your GCM project credentials, project number (Sender ID) and API key, and click **Save**.  
+
+### Deploy the custom Node application to Bluemix
+
+The helloTodoAdvanced sample application requires custom code to be deployed to the Node.js application running on Bluemix. This code:
+* Handles protecting specific endpoints with Mobile Client Access, such as deleting an item from the list.
+* Contains a function that handles sending push notifications to all registered devices when an item has been marked as completed.
+
+To learn more about this custom code, you can view the source: [Custom Node.js code](https://github.com/ibm-bluemix-mobile-services/bms-samples-hellotodo-advanced/blob/master/NodeJS/server/server.js).
+
+1. Edit `manifest.yml` file. Change the `host` property to a unique value. The value is empty in the provided `manifest.yml` file.  
+2. Edit the `manifest.yml` file and add the services section. Add the Mobile Client Access service instance name that you created in previous steps. For example:  
+
+![image](updated-manifest.png)
+
+3. Run the **cf push** command to deploy your application to Bluemix.   Bind the Node.js app to the Mobile Client Access service instance and start the app.
+
+4. When deployment completes, use the **cf apps** command to see the list of available applications and their routes.
+
+5. Your Bluemix application is available at: `https//{hostname-from-manifest.yml}.mybluemix.net`
+
+
 
 ### Configure the front end in the helloTodoAdvanced sample
 
