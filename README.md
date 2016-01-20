@@ -65,7 +65,7 @@ Before you can run the helloTodoAdvanced application, you must set up a mobile b
 
 #### Access the StrongLoop backend app
 
-1. Open the **appRoute** URL that you copied from the Bluemix dashboard in your browser. You'll see the web interface for the helloTodoAdvanced backend.
+1. Open the **appRoute** URL that you copied from the Bluemix dashboard in your browser. You'll see the web interface for the MobileFirst boilerplate backend.
 2. Follow the guided experience steps that are described in the web interface. <br/>Eventually, you cannot DELETE a todo item.  You can only delete todo items when you are using this sample.
 The mobile backend is protected by Mobile Client Access by default.  Mobile Client Access is a Bluemix service that provides security and monitoring functionality for mobile backend applications.
 
@@ -99,12 +99,10 @@ The helloTodoAdvanced sample application requires custom code to be deployed to 
 
 To learn more about this custom code, you can view the source: [Custom Node.js code](https://github.com/ibm-bluemix-mobile-services/bms-samples-hellotodo-advanced/blob/master/NodeJS/server/server.js).
 
-1. Edit `manifest.yml` file. Change the `host` property to a unique value. The value is empty in the provided `manifest.yml` file.  
+1. Edit `manifest.yml` file. Change the `host` property to a unique value, typically the app name you assigned when creating the Bluemix MobileFirst boilerplate app. The value is empty in the provided `manifest.yml` file. You can add the same value to `name` too if you like.  
 2. Edit the `manifest.yml` file and add the services section. Add the Mobile Client Access service instance name that you created in previous steps. For example:  
-
-![image](updated-manifest.png)
-
-3. Run the **cf push** command to deploy your application to Bluemix.   Bind the Node.js app to the Mobile Client Access service instance and start the app.
+![image](updated-manifest.png)  
+3. Run the **cf push your_Bluemix_app_name** command to deploy your application to Bluemix.   Bind the Node.js app to the Mobile Client Access service instance and start the app.
 
 4. When deployment completes, use the **cf apps** command to see the list of available applications and their routes.
 
@@ -213,12 +211,12 @@ This sample contains custom Node.js code to handle sending push notifications to
 * Client-side code  (notifyAllDevices function), that handles sending a POST request to our `notifyAllDevices` endpoint on Bluemix.  
 * When an item is marked as complete, the corresponding item information is sent to the Node.js application. The custom code then creates and sends out a push notification to all registered devices, informing the item has been completed.  
 
-**Note:** The `/notifyAllDevices` endpoint has also been protected by the Mobile Client Access service and the Facebook authentication that you configured. You can to send these notifications only after you log in to Facebook from the mobile application.
+> **Note:** The `/notifyAllDevices` endpoint has also been protected by the Mobile Client Access service and the Facebook authentication that you configured. You can to send these notifications only after you log in to Facebook from the mobile application.
 
 
 
 ### Xcode requirement
-**Note:** The project has bitcode support disabled because the Bluemix Mobile Services SDK does not currently support bitcode. For more information, see: [Connect Your iOS 9 App to Bluemix](https://developer.ibm.com/bluemix/2015/09/16/connect-your-ios-9-app-to-bluemix/)
+**Be Aware:** The project has bitcode support disabled because the Bluemix Mobile Services SDK does not currently support bitcode. For more information, see: [Connect Your iOS 9 App to Bluemix](https://developer.ibm.com/bluemix/2015/09/16/connect-your-ios-9-app-to-bluemix/)
 
 ### License
 This package contains sample code provided in source code form. The samples are licensed under the under the Apache License, Version 2.0 (the "License"). You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 and may also view the license in the license.txt file within this package. Also see the notices.txt file within this package for additional notices.
