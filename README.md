@@ -28,7 +28,7 @@ Use the following steps to configure the helloTodo-Advanced sample:
 
 
 ### Download the helloTodoAdvanced sample
-Clone the sample from GitHub with the following command:
+Clone the sample from GitHub with the following command:  
 `
 git clone https://github.com/ibm-bluemix-mobile-services/bms-samples-hellotodo-advanced
 `
@@ -69,7 +69,7 @@ To learn more about this custom code, you can view the source: [Custom Node.js c
 
 #### Deploy the application
 1. Edit `manifest.yml` file. Change the `host` property to a unique value. The value is empty in the provided `manifest.yml` file.  
-2. Edit the `manifest.yml` file and add the services section. Add the Mobile Client Access service instance name that you created in previous steps. For example: ![image](updated-manifest.png)
+2. Edit the `manifest.yml` file and add the services section. Add the Mobile Client Access service instance name that you created in previous steps. For example:  ![image](updated-manifest.png)
 
 3. Run the **cf push** command to deploy your application to Bluemix.   Bind the Node.js app to the Mobile Client Access service instance and start the app.
 
