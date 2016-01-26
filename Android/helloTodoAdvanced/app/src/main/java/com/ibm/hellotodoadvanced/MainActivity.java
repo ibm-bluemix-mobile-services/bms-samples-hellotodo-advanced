@@ -230,7 +230,7 @@ public class MainActivity extends Activity implements ResponseListener {
 
     /**
      * Formulates and sends REST request to the custom Node.js endpoint "<your_bluemix_route>/notifyAllDevices" deployed on Bluemix.
-     * Expect an incoming push notification if configured correctly.
+     * If configured correctly, expect an incoming push notification.
      * @param completedItem the task completed.
      */
     private void notifyAllDevices(String completedItem) {
@@ -275,8 +275,7 @@ public class MainActivity extends Activity implements ResponseListener {
 
     /**
      * Initializes the main list view and sets long click listener for delete.
-     * Note: the Node delete endpoint is protected by MCA and can only be done with an authorized header from the device.
-     * This is handled by the core SDK and will work if Facebook auth succeeded.
+     * Note: the Node delete endpoint is protected by Mobile Client Access and can only be accessed with an authorized header from the Client SDK.
      */
     private void initListView() {
         // Get MainActivity's ListView
@@ -311,7 +310,7 @@ public class MainActivity extends Activity implements ResponseListener {
                         loadList();
                     }
 
-                    // If the request fails, log the errors
+                    // If the request fails, log errors
                     @Override
                     public void onFailure(Response response, Throwable t, JSONObject extendedInfo) {
 
@@ -581,7 +580,7 @@ public class MainActivity extends Activity implements ResponseListener {
 
 
     /**
-     * Changes completed image and flips TodoItem isDone boolean value. Same request as editTodoName.
+     * Changes completed image and flips TodoItem isDone boolean value. Same REST request as editTodoName.
      *
      * @param view The TodoItem that has been tapped.
      */
