@@ -26,12 +26,6 @@ dependencies {
     compile 'com.android.support:design:23.1.1'
 
     compile group: 'com.ibm.mobilefirstplatform.clientsdk.android',
-            name: 'core',
-            version: '1.+',
-            ext: 'aar',
-            transitive: true
-
-    compile group: 'com.ibm.mobilefirstplatform.clientsdk.android',
             name: 'push',
             version: '1.+',
             ext: 'aar',
