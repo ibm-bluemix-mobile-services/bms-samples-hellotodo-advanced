@@ -6,7 +6,8 @@ This helloTodoAdvanced sample app contains an Objective-C project, an Android pr
 
 ### Before you begin
   Before you start, make sure that you have:
- * A [Bluemix](http://bluemix.net) account
+ * A [Bluemix](http://bluemix.net) account  
+ * [Cloud Foundry CLI](https://github.com/cloudfoundry/cli/releases)
  * Facebook Developer Application. 
  [Learn more about using Facebook as an identity provider](https://www.ng.bluemix.net/docs/services/mobileaccess/security/facebook/t_fb_config.html)
  
