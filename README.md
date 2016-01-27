@@ -134,6 +134,7 @@ IMFClient *imfClient = [IMFClient sharedInstance];
 return YES;
 }
 ```
+>Note: With the new Application Transport Security introduced in iOS9, it is recommended to configure your application to connect to the secure Https Bluemix endpoint (Https://{Application_Name}.mybluemix.net) 
 
 #### Android:  
 
