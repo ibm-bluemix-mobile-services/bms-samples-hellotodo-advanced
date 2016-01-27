@@ -15,9 +15,8 @@ This helloTodoAdvanced sample app contains an Objective-C project, an Android pr
 **iOS:**  
 * XCode Version 7.1
 * Physical iOS device
-* Valid APNs enabled bundle id
-* Provisioning profile
-* Development certificate  
+* Properly Configured APNs Artifacts. To create and configure your APNs credentials, follow the instructions at  
+[Creating and configuring push credentials for APNs](https://www.ng.bluemix.net/docs/services/mobilepush/t_push_config_provider_ios.html)
 
 > **Note:** For push notifications to work successfully, you must run the helloTodoAdvanced sample on a physical iOS device with a valid APNs enabled bundle id, provisioning profile, and development certificate.
  
