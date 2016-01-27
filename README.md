@@ -183,7 +183,7 @@ For more information about using Facebook as an identity provider, see [Enabling
 
 #### Android:
 
-1. Navigate to the `strings.xml` file, in the  `Android\helloTodoAdvanced\bluelist\app\src\main\res\values\` directory. Replace `Your_facebook_app_id` with the appID from the Facebok application you created.
+1. Navigate to the `strings.xml` file, in the  `Android\helloTodoAdvanced\bluelist\app\src\main\res\values\` directory. Replace `Your_Facebook_App_Id` with the appID from the Facebook application you created.
 1. Verify that your Google Play package name in your Facebook app is `com.ibm.helloTodoAdvanced` and that your class name is `com.ibm.helloTodoAdvanced.MainActivity`.
 
 For more information about using Facebook as an identity provider, see [Enabling Facebook authentication in Android apps](https://www.ng.bluemix.net/docs/services/mobileaccess/facebook-auth-android.html).
