@@ -101,7 +101,7 @@ To learn more about this custom code, you can view the source: [Custom Node.js c
 
 1. Edit `manifest.yml` file. Change the `host` property to a unique value, typically the app name you assigned when creating the Bluemix MobileFirst boilerplate app. The value is empty in the provided `manifest.yml` file. You can add the same value to `name` too if you like.  
 2. Edit the `manifest.yml` file and add the services section. Add the Mobile Client Access service instance name that you created in previous steps. For example:  
-![image](updated-manifest.png)  
+![manifest](manifest.png)  ![MCAAppName](MCAAppName.png)  
 3. Run the **cf push your_Bluemix_app_name** command to deploy your application to Bluemix.   Bind the Node.js app to the Mobile Client Access service instance and start the app.
 
 4. When deployment completes, use the **cf apps** command to see the list of available applications and their routes.
