@@ -55,7 +55,7 @@ import java.util.List;
 
 /**
  * The {@code MainActivity} is the primary visual activity shown when the app is being interacted with.
- * The ResponseListener interface is implemented to handle Mobile Client Access Facebook auth and related responses.
+ * The ResponseListener interface is implemented to handle Mobile Client Access authentication and related responses.
  */
 public class MainActivity extends Activity implements ResponseListener {
 
@@ -70,7 +70,7 @@ public class MainActivity extends Activity implements ResponseListener {
     private BMSClient client; // IBM Mobile First Client SDK
 
     private MFPPush push; // Push client
-    private MFPPushNotificationListener notificationListener; // Notification listener to handle a push sent to the phone
+    private MFPPushNotificationListener notificationListener; // Notification listener to handle push notifications sent to the application
 
 
     @Override
@@ -100,25 +100,26 @@ public class MainActivity extends Activity implements ResponseListener {
     protected void onResume() {
         super.onResume();
 
-        // Calling the auth initalization code in onResume ensures that Facebook authentication is required whener the app is opened
+        // Calling the auth initialization code in onResume ensures that Facebook authentication is required whenever the app enters the foreground
         initFBAuth();
     }
 
     /**
-     * Handles configuring and starting Facebook authentication
+     * Handles configuring and starting authentication
+     * If Facebook auth is configured properly, a public FB login will be required before the authorization header can be obtained
      */
     private void initFBAuth(){
-        // Register this ativity to handle Facebook auth response using the ResponseListener interface
+        // Register this activity to handle Facebook auth response using the ResponseListener interface
         FacebookAuthenticationManager.getInstance().register(this);
 
-        // Obtaining an authorization header kicks off the Facebok login process, if successful the onSuccess() function is called
-        // Note: if no auth is configured in the Bluemix MCA instance this auth will succeed automatically since it only checks that the request is coming from a Mobile First SDK
+        // Obtaining an authorization header kicks off the Facebook login process. If successful, the onSuccess() function is called and the authorization header is cached to be used on outbound requests.
+        // Note: if no auth is configured in the Bluemix MCA instance this auth will succeed automatically since it only checks that the request is coming from a Mobile First SDK.
         AuthorizationManager.getInstance().obtainAuthorizationHeader(this, this);
     }
 
 
     /**
-     * Handles response from Bluemix MCA, kicks off the Facebook login intent, and routes appropriately, this should always be the same depending on the form of auth.
+     * Handles response from Bluemix MCA, kicks off the Facebook login intent, and routes appropriately, this should always be the same depending on the form of auth (Facebook auth manager vs Google auth manager etc...).
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -133,7 +134,7 @@ public class MainActivity extends Activity implements ResponseListener {
      */
     @Override
     public void onSuccess(Response response) {
-        Log.i(TAG, "Logged into Facebook successfully: " + response.getResponseText());
+        Log.i(TAG, "Successfully authenticated against MCA: " + response.getResponseText());
 
         // Register for push notifications and show data now that the user is authenticated
         registerForPush();
@@ -146,14 +147,16 @@ public class MainActivity extends Activity implements ResponseListener {
      */
     @Override
     public void onFailure(Response response, Throwable t, JSONObject extendedInfo) {
+
+        // any of these values can be null, be sure to check all of them
         if(response != null) {
-            Log.e(TAG, "Failed to login to Facebook: Response: " + response.getResponseText());
+            Log.e(TAG, "Failed to authenticate against MCA: Response: " + response.getResponseText());
         }if (t != null){
-            Log.e(TAG, "Failed to login to Facebook: Throwable: " + t.getMessage());
+            Log.e(TAG, "Failed to authenticate against MCA: Throwable: " + t.getMessage());
         }if (extendedInfo != null){
-            Log.e(TAG, "Failed to login to Facebook: ExtendedInfo: " + extendedInfo.toString());
+            Log.e(TAG, "Failed to authenticate against MCA: ExtendedInfo: " + extendedInfo.toString());
         }else{
-            Log.e(TAG, "Failed to login to Facebook, unknown reason");
+            Log.e(TAG, "Failed to authenticate against MCA, unknown reason");
         }
     }
 
@@ -161,16 +164,16 @@ public class MainActivity extends Activity implements ResponseListener {
      * Initializes the Mobile First Push SDK and creates notification listener to handle incoming push notifications.
      */
     private void initPush(){
-        // Initialize Push client
+        // Initialize Push client using this activity as the context
         push = MFPPush.getInstance();
-
         push.initialize(this);
 
-        // Create notification listener and enable pop up notification when a message is received
+        // Create notification listener and enable pop up alert notification when a message is received
         // Note: You may see some errors in the logs on notification receipt indicating missing values. These are non-fatal and can be ignored.
         notificationListener = new MFPPushNotificationListener() {
             @Override
             public void onReceive(final MFPSimplePushNotification message) {
+                // The entire message is printed in the log for your understanding
                 Log.i(TAG, "Received a Push Notification: " + message.toString());
                 runOnUiThread(new Runnable() {
                     public void run() {
@@ -179,7 +182,7 @@ public class MainActivity extends Activity implements ResponseListener {
                                 .setMessage(message.getAlert())
                                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int whichButton) {
-                                        // Make sure most up to date data is displayed when notification is dismissed.
+                                        // Make sure most up to date cloud data is displayed when notification is dismissed.
                                         loadList();
                                     }
                                 })
@@ -201,12 +204,14 @@ public class MainActivity extends Activity implements ResponseListener {
             @Override
             public void onSuccess(String s) {
                 Log.i(TAG, "Successfully registered for push notifications: " + s);
+                // Begin listening
                 push.listen(notificationListener);
             }
 
             @Override
             public void onFailure(MFPPushException e) {
                 Log.e(TAG,"Failed to register for notifications: " + e.getErrorMessage());
+                // Set null on failure so the sdk does not need to hold notifications
                 push = null;
             }
         };
@@ -217,12 +222,19 @@ public class MainActivity extends Activity implements ResponseListener {
 
     /**
      * If the device has been registered successfully, hold push notifications when the app is paused.
+     * Also, clear authorization data when the app leaves the foreground. This forces successful authentication to see cloud data when the app re-enters the foreground.
      * Note: As soon as push.listen(notificationListener) is called again, the notifications will be released.
      */
     @Override
     protected void onPause() {
         super.onPause();
 
+        Log.i(TAG, "Clearing authorization data since the app is leaving the foreground");
+
+        // Logs the user out by clearing the authorization data from the sdk.
+        AuthorizationManager.getInstance().clearAuthorizationData();
+
+        // Holds notifications.
         if (push != null) {
             push.hold();
         }
@@ -230,7 +242,7 @@ public class MainActivity extends Activity implements ResponseListener {
 
     /**
      * Formulates and sends REST request to the custom Node.js endpoint "<your_bluemix_route>/notifyAllDevices" deployed on Bluemix.
-     * If configured correctly, expect an incoming push notification.
+     * If configured correctly, expect an incoming push notification with the description of the completed item.
      * @param completedItem the task completed.
      */
     private void notifyAllDevices(String completedItem) {
@@ -268,6 +280,8 @@ public class MainActivity extends Activity implements ResponseListener {
                 }
                 if (extendedInfo != null) {
                     Log.e(TAG, "Notify all devices failed with: " + extendedInfo.toString());
+                }else{
+                    Log.e(TAG, "Notify all devices failed with reason unknown");
                 }
             }
         });
@@ -275,7 +289,7 @@ public class MainActivity extends Activity implements ResponseListener {
 
     /**
      * Initializes the main list view and sets long click listener for delete.
-     * Note: the Node delete endpoint is protected by Mobile Client Access and can only be accessed with an authorized header from the Client SDK.
+     * Note: the Node delete endpoint is protected by Mobile Client Access and can only be accessed with an authorization header from the Client SDK.
      */
     private void initListView() {
         // Get MainActivity's ListView
@@ -316,12 +330,12 @@ public class MainActivity extends Activity implements ResponseListener {
 
                         if (t != null) {
                             Log.e(TAG, "deleteItem failed with error: " + t.getLocalizedMessage());
-                        } else if (response != null) {
+                        } if (response != null) {
                             Log.e(TAG, "deleteItem failed with error: " + response.toString());
-                        } else if (extendedInfo != null) {
+                        } if (extendedInfo != null) {
                             Log.e(TAG, "deleteItem failed with error: " + extendedInfo.toString());
                         } else {
-                            Log.e(TAG, "deleteItem failed with error: Reason Unkown");
+                            Log.e(TAG, "deleteItem failed, reason Unkown");
                         }
 
                     }
@@ -349,70 +363,73 @@ public class MainActivity extends Activity implements ResponseListener {
     }
 
     /**
-     * Uses IBM Mobile First SDK to get the TodoItems from Bluemix and updates the local list
+     * Checks to ensure a cached authorization header is present.
+     * Then uses the IBM Mobile First SDK to get the TodoItems from Bluemix and updates the local list.
      */
     private void loadList() {
 
-        // Identify and send GET Request with response listener
-        Request request = new Request(client.getBluemixAppRoute()+"/api/Items", Request.GET);
-        request.send(getApplicationContext(), new ResponseListener() {
-            // Loop through JSON response and create local TodoItems if successful
-            @Override
-            public void onSuccess(Response response) {
-                if (response.getStatus() != 200) {
-                    Log.e(TAG, "Error pulling items from Bluemix: " + response.toString());
-                } else {
+        if(!AuthorizationManager.getInstance().getCachedAuthorizationHeader().isEmpty()) {
+            // Identify and send GET Request with response listener
+            Request request = new Request(client.getBluemixAppRoute() + "/api/Items", Request.GET);
+            request.send(getApplicationContext(), new ResponseListener() {
+                // Loop through JSON response and create local TodoItems if successful
+                @Override
+                public void onSuccess(Response response) {
+                    if (response.getStatus() != 200) {
+                        Log.e(TAG, "Error pulling items from Bluemix: " + response.toString());
+                    } else {
 
-                    try {
+                        try {
 
-                        mTodoItemList.clear();
+                            mTodoItemList.clear();
 
-                        JSONArray jsonArray = new JSONArray(response.getResponseText());
+                            JSONArray jsonArray = new JSONArray(response.getResponseText());
 
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            JSONObject temp = jsonArray.getJSONObject(i);
-                            TodoItem tempTodo = new TodoItem();
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                JSONObject temp = jsonArray.getJSONObject(i);
+                                TodoItem tempTodo = new TodoItem();
 
-                            tempTodo.idNumber = temp.getInt("id");
-                            tempTodo.text = temp.getString("text");
-                            tempTodo.isDone = temp.getBoolean("isDone");
+                                tempTodo.idNumber = temp.getInt("id");
+                                tempTodo.text = temp.getString("text");
+                                tempTodo.isDone = temp.getBoolean("isDone");
 
-                            mTodoItemList.add(tempTodo);
-                        }
-
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                mTodoItemAdapter.notifyDataSetChanged();
-
-                                if (mSwipeLayout.isRefreshing()) {
-                                    mSwipeLayout.setRefreshing(false);
-                                }
+                                mTodoItemList.add(tempTodo);
                             }
-                        });
 
-                    } catch (Exception e) {
-                        Log.e(TAG, "Error reading response JSON: " + e.getLocalizedMessage());
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mTodoItemAdapter.notifyDataSetChanged();
+
+                                    if (mSwipeLayout.isRefreshing()) {
+                                        mSwipeLayout.setRefreshing(false);
+                                    }
+                                }
+                            });
+
+                        } catch (Exception e) {
+                            Log.e(TAG, "Error reading response JSON: " + e.getLocalizedMessage());
+                        }
                     }
                 }
-            }
 
-            // Log Errors on failure
-            @Override
-            public void onFailure(Response response, Throwable throwable, JSONObject jsonObject) {
-                if (throwable != null) {
-                    Log.e(TAG, "Failed sending request to Bluemix: " + throwable.getLocalizedMessage());
+                // Log Errors on failure
+                @Override
+                public void onFailure(Response response, Throwable throwable, JSONObject jsonObject) {
+                    if (throwable != null) {
+                        Log.e(TAG, "Failed sending loadList request to Bluemix: " + throwable.getLocalizedMessage());
+                    }
+                    if (response != null) {
+                        Log.e(TAG, "Failed sending loadList request to Bluemix: " + response.toString());
+                    }
+                    if (jsonObject != null) {
+                        Log.e(TAG, "Failed sending loadList request to Bluemix: " + jsonObject.toString());
+                    } else {
+                        Log.e(TAG, "Failed sending loadList request to Bluemix, reason unkown");
+                    }
                 }
-                if (response != null) {
-                    Log.e(TAG, "Failed sending request to Bluemix: " + response.toString());
-                }
-                if (jsonObject != null) {
-                    Log.e(TAG, "Failed sending request to Bluemix: " + jsonObject.toString());
-                } else {
-                    Log.e(TAG, "Failed sending request to Bluemix: Reason Unkown");
-                }
-            }
-        });
+            });
+        }
     }
 
     /**
@@ -481,6 +498,8 @@ public class MainActivity extends Activity implements ResponseListener {
                             }
                             if (extendedInfo != null) {
                                 Log.e(TAG, "createItem failed with error: " + extendedInfo.toString());
+                            }else{
+                                Log.e(TAG, "createItem failed, reason unknown");
                             }
 
                         }
@@ -560,13 +579,15 @@ public class MainActivity extends Activity implements ResponseListener {
                         @Override
                         public void onFailure(Response response, Throwable t, JSONObject extendedInfo) {
                             if (response != null) {
-                                Log.e("MainActivity", "updateItem failed with error: " + response.getResponseText());
+                                Log.e(TAG, "updateItem failed with error: " + response.getResponseText());
                             }
                             if (t != null) {
-                                Log.e("MainActivity", "updateItem failed with error: " + t.getLocalizedMessage(), t);
+                                Log.e(TAG, "updateItem failed with error: " + t.getLocalizedMessage(), t);
                             }
                             if (extendedInfo != null) {
-                                Log.e("MainActivity", "updateItem failed with error: " + extendedInfo.toString());
+                                Log.e(TAG, "updateItem failed with error: " + extendedInfo.toString());
+                            }else{
+                                Log.e(TAG, "updateItem failed, reason unknown");
                             }
 
                         }
@@ -581,7 +602,7 @@ public class MainActivity extends Activity implements ResponseListener {
 
     /**
      * Changes completed image and flips TodoItem isDone boolean value. Same REST request as editTodoName.
-     *
+     * Calls notifyAllDevices if an item is successfully completed.
      * @param view The TodoItem that has been tapped.
      */
     public void isDoneToggle(View view) {
@@ -608,7 +629,7 @@ public class MainActivity extends Activity implements ResponseListener {
         request.setHeaders(headers);
 
         request.send(getApplicationContext(), json, new ResponseListener() {
-            // On success, update local list with updated TodoItem
+            // On success, update local list with updated TodoItem, and call notifyAllDevices of marked complete.
             @Override
             public void onSuccess(Response response) {
                 Log.i(TAG, "Item completeness updated successfully");
@@ -631,6 +652,8 @@ public class MainActivity extends Activity implements ResponseListener {
                 }
                 if (extendedInfo != null) {
                     Log.e(TAG, "isDoneToggle failed with error: " + extendedInfo.toString());
+                } else {
+                    Log.e(TAG, "isDoneToggle failed, reason unknown");
                 }
             }
         });
