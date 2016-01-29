@@ -36,7 +36,7 @@
 
 - (void)listItems
 {
-    if ([IMFAuthorizationManager sharedInstance].userIdentity != NULL){
+    if ([IMFAuthorizationManager sharedInstance].cachedAuthorizationHeader != NULL ){
     NSString *restAPIURL = [NSString stringWithFormat:@"%@/api/Items",_backendRoute];
     IMFResourceRequest* request = [IMFResourceRequest requestWithPath:restAPIURL];
     [request setHTTPMethod:@"GET"];
@@ -56,6 +56,7 @@
             }
             self.itemList = itemArray;
             [self reloadLocalTableData];
+      
         }
     }];
     }}
@@ -165,7 +166,8 @@
             NSLog(@"You have obtained the authorization token from Bluemix successfully.");
             //Register for Push once Login to MCA is successful
             [self registerForPush];
-            [self listItems];       }
+            [self listItems];
+            }
         
         }];
     
