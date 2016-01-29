@@ -36,6 +36,7 @@
 
 - (void)listItems
 {
+    if ([IMFAuthorizationManager sharedInstance].cachedAuthorizationHeader != NULL ){
     NSString *restAPIURL = [NSString stringWithFormat:@"%@/api/Items",_backendRoute];
     IMFResourceRequest* request = [IMFResourceRequest requestWithPath:restAPIURL];
     [request setHTTPMethod:@"GET"];
@@ -55,9 +56,10 @@
             }
             self.itemList = itemArray;
             [self reloadLocalTableData];
+      
         }
     }];
-}
+    }}
 
 
 - (void) createItem: (NSString*) itemText
@@ -109,7 +111,6 @@
         }
         else {
             NSLog(@"Item  updated successfully");
-            
         }
         [self listItems];
     }];
@@ -163,9 +164,11 @@
             NSLog(@"%@",error);
         } else {
             NSLog(@"You have obtained the authorization token from Bluemix successfully.");
-            //Register for Push once Login to MCA is succesful
+            //Register for Push once Login to MCA is successful
             [self registerForPush];
-        }
+            [self listItems];
+            }
+        
         }];
     
 }
