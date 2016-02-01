@@ -19,6 +19,9 @@ try {
         var vcap = JSON.parse(process.env.VCAP_SERVICES);
 		var pushSecret = vcap.imfpush[0].credentials.appSecret;
 		var appId = vcap.AdvancedMobileAccess[0].credentials.clientId;
+		var url = vcap.AdvancedMobileAccess[0].credentials.serverUrl;
+		url = url.split('.');
+	
 	}catch (e) {
         console.error("Error encountered while obtaining Bluemix service credentials." +
             " Make certain that the Mobile Client Access and imfPush service are bound to this application." +
@@ -60,7 +63,7 @@ app.post('/notifyAllDevices', passport.authenticate('mca-backend-strategy', {ses
 	
 	// Formulate and send outbound REST request using the request.js library
 	request({
-		url: "https://mobile.ng.bluemix.net/imfpush/v1/apps/" + appId + "/messages",
+		url: "https://mobile." + url[1] + ".bluemix.net/imfpush/v1/apps/" + appId + "/messages",
 		method: "POST",
 		json: true,
 		body: jsonObject,
