@@ -24,9 +24,7 @@
     _backendRoute =[NSString stringWithFormat:@"%@",imfClient.backendRoute];
     self.refreshControl = [[UIRefreshControl alloc]init];
     [self.tableView addSubview:self.refreshControl];
-    [self.refreshControl addTarget:self action:@selector(handleRefreshAction) forControlEvents:UIControlEventValueChanged];
-    [self listItems];
-    
+    [self.refreshControl addTarget:self action:@selector(handleRefreshAction) forControlEvents:UIControlEventValueChanged];    
 }
 
 - (void)didReceiveMemoryWarning {
@@ -55,9 +53,10 @@
             }
             self.itemList = itemArray;
             [self reloadLocalTableData];
+      
         }
     }];
-}
+    }
 
 
 - (void) createItem: (NSString*) itemText
@@ -109,7 +108,6 @@
         }
         else {
             NSLog(@"Item  updated successfully");
-            
         }
         [self listItems];
     }];
@@ -148,7 +146,6 @@
         }
         else {
             NSLog(@"Successfully notified all devices");
-            
         }
         [self listItems];
     }];
@@ -163,9 +160,11 @@
             NSLog(@"%@",error);
         } else {
             NSLog(@"You have obtained the authorization token from Bluemix successfully.");
-            //Register for Push once Login to MCA is succesful
+            //Register for Push once Login to MCA is successful
             [self registerForPush];
-        }
+            [self listItems];
+            }
+        
         }];
     
 }

@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <resources>
-    <string name="app_name">helloTodoAdvanced (pull down to refresh)</string>
+    <string name="app_name">Hello Todo Advanced</string>
     <string name="Title">helloTodo</string>
     <string name="todo">New Todo</string>
     <string name="Done">Done</string>

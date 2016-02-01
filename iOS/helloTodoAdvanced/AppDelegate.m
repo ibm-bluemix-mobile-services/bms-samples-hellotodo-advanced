@@ -31,7 +31,7 @@
     // https://developer.apple.com/library/prerelease/ios/releasenotes/General/WhatsNewIniOS/Articles/iOS9.html
     
     IMFClient *imfClient = [IMFClient sharedInstance];
-    [imfClient initializeWithBackendRoute:@"<Application_ID>" backendGUID:@"<Application_Route"];
+    [imfClient initializeWithBackendRoute:@"<Application_Route>" backendGUID:@"<Application_ID>"];
     [[IMFFacebookAuthenticationHandler sharedInstance] registerWithDefaultDelegate];
       return YES;
 }

@@ -17,8 +17,11 @@
                             <rect key="frame" x="0.0" y="0.0" width="600" height="63"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
-                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Hello Todo" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7C1-3Y-1lw">
-                                    <rect key="frame" x="259" y="21" width="82" height="21"/>
+                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Hello Todo Advanced" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7C1-3Y-1lw">
+                                    <rect key="frame" x="219" y="21" width="163" height="21"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" constant="163" id="EXH-Ds-3ua"/>
+                                    </constraints>
                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                     <nil key="highlightedColor"/>
@@ -26,9 +29,9 @@
                             </subviews>
                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             <constraints>
-                                <constraint firstItem="7C1-3Y-1lw" firstAttribute="centerY" secondItem="uwa-c5-X08" secondAttribute="centerY" id="Ovw-Zy-LdB"/>
-                                <constraint firstItem="7C1-3Y-1lw" firstAttribute="centerX" secondItem="uwa-c5-X08" secondAttribute="centerX" id="Tgn-65-q9W"/>
-                                <constraint firstItem="7C1-3Y-1lw" firstAttribute="top" secondItem="uwa-c5-X08" secondAttribute="top" constant="21" id="dEQ-RW-khB"/>
+                                <constraint firstItem="7C1-3Y-1lw" firstAttribute="centerX" secondItem="uwa-c5-X08" secondAttribute="centerX" id="2CW-uT-vwe"/>
+                                <constraint firstItem="7C1-3Y-1lw" firstAttribute="centerY" secondItem="uwa-c5-X08" secondAttribute="centerY" id="bUW-ib-L8H"/>
+                                <constraint firstItem="7C1-3Y-1lw" firstAttribute="top" secondItem="uwa-c5-X08" secondAttribute="top" constant="21" id="cj4-rj-V0w"/>
                             </constraints>
                         </view>
                         <prototypes>
@@ -36,7 +39,7 @@
                                 <rect key="frame" x="0.0" y="85" width="600" height="49"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Mx8-HR-tGl" id="t1s-Wb-vsh">
-                                    <rect key="frame" x="0.0" y="0.0" width="600" height="49"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="600" height="48.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="dl4-0j-hAS">
@@ -55,7 +58,7 @@
                                 <rect key="frame" x="0.0" y="134" width="600" height="49"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="j5t-yp-gAf" id="pmh-Wd-Sda">
-                                    <rect key="frame" x="0.0" y="0.0" width="600" height="49"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="600" height="48.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Add Item" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="o5q-Mv-mYh">
