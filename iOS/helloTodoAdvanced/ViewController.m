@@ -24,9 +24,7 @@
     _backendRoute =[NSString stringWithFormat:@"%@",imfClient.backendRoute];
     self.refreshControl = [[UIRefreshControl alloc]init];
     [self.tableView addSubview:self.refreshControl];
-    [self.refreshControl addTarget:self action:@selector(handleRefreshAction) forControlEvents:UIControlEventValueChanged];
-    [self listItems];
-    
+    [self.refreshControl addTarget:self action:@selector(handleRefreshAction) forControlEvents:UIControlEventValueChanged];    
 }
 
 - (void)didReceiveMemoryWarning {
@@ -36,7 +34,6 @@
 
 - (void)listItems
 {
-    if ([IMFAuthorizationManager sharedInstance].cachedAuthorizationHeader != NULL ){
     NSString *restAPIURL = [NSString stringWithFormat:@"%@/api/Items",_backendRoute];
     IMFResourceRequest* request = [IMFResourceRequest requestWithPath:restAPIURL];
     [request setHTTPMethod:@"GET"];
@@ -59,7 +56,7 @@
       
         }
     }];
-    }}
+    }
 
 
 - (void) createItem: (NSString*) itemText
@@ -82,9 +79,10 @@
         }
         else {
             NSLog(@"Item created successfully");
+            [self listItems];
             
         }
-        [self listItems];
+        
     }];
 }
 
@@ -111,8 +109,9 @@
         }
         else {
             NSLog(@"Item  updated successfully");
+            [self listItems];
         }
-        [self listItems];
+        
     }];
     
     
@@ -129,8 +128,9 @@
         }
         else {
             NSLog(@"Item  deleted successfully");
+            [self listItems];
         }
-        [self listItems];
+        
     }];
 }
 
@@ -149,9 +149,8 @@
         }
         else {
             NSLog(@"Successfully notified all devices");
-            
         }
-        [self listItems];
+        
     }];
     
     
