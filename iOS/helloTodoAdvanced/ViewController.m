@@ -79,9 +79,10 @@
         }
         else {
             NSLog(@"Item created successfully");
+            [self listItems];
             
         }
-        [self listItems];
+        
     }];
 }
 
@@ -108,8 +109,9 @@
         }
         else {
             NSLog(@"Item  updated successfully");
+            [self listItems];
         }
-        [self listItems];
+        
     }];
     
     
@@ -126,8 +128,9 @@
         }
         else {
             NSLog(@"Item  deleted successfully");
+            [self listItems];
         }
-        [self listItems];
+        
     }];
 }
 
@@ -147,7 +150,7 @@
         else {
             NSLog(@"Successfully notified all devices");
         }
-        [self listItems];
+        
     }];
     
     
