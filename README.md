@@ -104,9 +104,7 @@ To learn more about this custom code, you can view the source: [Custom Node.js c
 ![manifest](manifest.png)  ![MCAAppName](MCAAppName.png)  
 3. After logging in to Bluemix using the command `cf login -a https://api.region.bluemix.net` (where region is either ng, eu-gb, or au-syd) navigate to the NodeJS directory. Run the `cf push your_Bluemix_app_name` command to deploy your application to Bluemix which will bind the custom Node.js code to the Mobile Client Access service instance and start the app.
 
-4. When deployment completes, use the `cf apps` command to see the list of available applications and their routes.
-
-5. Your Bluemix application is available at: `https//{hostname-from-manifest.yml}.mybluemix.net`
+4. Your Bluemix application is available at: `https//{hostname-from-manifest.yml}.mybluemix.net`
 
 
 
