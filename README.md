@@ -9,21 +9,21 @@ This helloTodoAdvanced sample app contains an Objective-C project, an Android pr
  * A [Bluemix](http://bluemix.net) account  
  * [Cloud Foundry CLI](https://github.com/cloudfoundry/cli/releases)
  * Facebook Developer Application. 
- [Learn more about using Facebook as an identity provider](https://www.ng.bluemix.net/docs/services/mobileaccess/security/facebook/t_fb_config.html)
+ [Learn more about using Facebook as an identity provider](https://www.bluemix.net/docs/services/mobileaccess/facebook-auth-overview.html)
  
  
 **iOS:**  
 * XCode Version 7.1
 * Physical iOS device
 * Properly Configured APNs Artifacts. To create and configure your APNs credentials, follow the instructions at  
-[Creating and configuring push credentials for APNs](https://www.ng.bluemix.net/docs/services/mobilepush/t_push_config_provider_ios.html)
+[Creating and configuring push credentials for APNs](https://www.bluemix.net/docs/services/mobilepush/t_push_provider_ios.html)
 
 > **Note:** For push notifications to work successfully, you must run the helloTodoAdvanced sample on a physical iOS device with a valid APNs enabled bundle id, provisioning profile, and development certificate.
  
 **Android:**  
 * Android Studio
 * Google Cloud Messaging (GCM) credentials. To obtain your GCM credentials, follow the instructions at  
-[configuring push credentials for GCM](https://www.ng.bluemix.net/docs/services/mobilepush/t_push_config_provider_android.html).
+[configuring push credentials for GCM](https://www.bluemix.net/docs/services/mobilepush/t_push_provider_android.html).
 
 ## Configuring the helloTodoAdvanced sample
 
@@ -103,11 +103,10 @@ To learn more about this custom code, you can view the source: [Custom Node.js c
 2. Edit the `manifest.yml` file and add the services section. Add the Mobile Client Access service instance name that you created in previous steps. For example:  
 ![manifest](manifest.png)  ![MCAAppName](MCAAppName.png)  
 3. After logging in to Bluemix using the command `cf login -a https://api.region.bluemix.net` (where region is either ng, eu-gb, or au-syd) navigate to the NodeJS directory. Run the `cf push your_Bluemix_app_name` command to deploy your application to Bluemix which will bind the custom Node.js code to the Mobile Client Access service instance and start the app.
-
-4. When deployment completes, use the `cf apps` command to see the list of available applications and their routes.
-
-5. Your Bluemix application is available at: `https//{hostname-from-manifest.yml}.mybluemix.net`
-
+4. If done correctly, you should now have the updated Node.js app running in your Bluemix environment. The
+screenshot below shows an instance that has started successfully:
+![cfpushstarted](cfpushstarted.png)
+5. Your Bluemix application is now available at: `https//{hostname-from-manifest.yml}.region.mybluemix.net`
 
 
 ### Configure the front end in the helloTodoAdvanced sample
@@ -179,14 +178,14 @@ Update URL Types, Item 0, URL Schemes, update Item 0 as follows:
 
 - **URL Schemes**: (for example `fb1581349575427190` , fb+Client ID from Facebook developer console)  
 
-For more information about using Facebook as an identity provider, see [Enabling Facebook authentication in iOS apps](https://www.ng.bluemix.net/docs/services/mobileaccess/facebook-auth-ios.html).
+For more information about using Facebook as an identity provider, see [Enabling Facebook authentication in iOS apps](https://www.bluemix.net/docs/services/mobileaccess/facebook-auth-ios.html).
 
 #### Android:
 
 1. Navigate to the `strings.xml` file, in the  `Android\helloTodoAdvanced\bluelist\app\src\main\res\values\` directory. Replace `Your_Facebook_App_Id` with the appID from the Facebook application you created.
 1. Verify that your Google Play package name in your Facebook app is `com.ibm.helloTodoAdvanced` and that your class name is `com.ibm.helloTodoAdvanced.MainActivity`.
 
-For more information about using Facebook as an identity provider, see [Enabling Facebook authentication in Android apps](https://www.ng.bluemix.net/docs/services/mobileaccess/facebook-auth-android.html).
+For more information about using Facebook as an identity provider, see [Enabling Facebook authentication in Android apps](https://www.bluemix.net/docs/services/mobileaccess/facebook-auth-android.html).
 
 
 ### Run the helloTodoAdvanced sample application
