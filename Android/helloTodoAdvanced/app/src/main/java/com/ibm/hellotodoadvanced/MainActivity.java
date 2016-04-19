@@ -79,8 +79,6 @@ public class MainActivity extends Activity implements ResponseListener {
     private MFPPush push; // Push client
     private MFPPushNotificationListener notificationListener; // Notification listener to handle push notifications sent to the application
 
-    private static final int PERMISSION_REQUEST_GET_ACCOUNTS = 0;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
