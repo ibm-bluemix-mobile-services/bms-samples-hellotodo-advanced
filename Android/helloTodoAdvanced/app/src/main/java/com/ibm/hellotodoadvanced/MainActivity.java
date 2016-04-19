@@ -17,12 +17,16 @@ package com.ibm.hellotodoadvanced;
  * limitations under the License.
  */
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.Gravity;
@@ -48,7 +52,10 @@ import com.ibm.mobilefirstplatform.clientsdk.android.security.facebookauthentica
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.MalformedURLException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -72,6 +79,7 @@ public class MainActivity extends Activity implements ResponseListener {
     private MFPPush push; // Push client
     private MFPPushNotificationListener notificationListener; // Notification listener to handle push notifications sent to the application
 
+    private static final int PERMISSION_REQUEST_GET_ACCOUNTS = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -154,16 +162,37 @@ public class MainActivity extends Activity implements ResponseListener {
             mTodoItemAdapter.notifyDataSetChanged();
         }
 
-        // any of these values can be null, be sure to check all of them
-        if(response != null) {
-            Log.e(TAG, "Failed to authenticate against MCA: Response: " + response.getResponseText());
-        }if (t != null){
-            Log.e(TAG, "Failed to authenticate against MCA: Throwable: " + t.getMessage());
-        }if (extendedInfo != null){
-            Log.e(TAG, "Failed to authenticate against MCA: ExtendedInfo: " + extendedInfo.toString());
-        }else{
-            Log.e(TAG, "Failed to authenticate against MCA, unknown reason");
+        String errorMessage = "";
+
+        // Check for 404s and unknown host exception since this is the first request made by the app
+        if (response != null) {
+            if (response.getStatus() == 404) {
+                errorMessage += "Application Route not found at:\n" + BMSClient.getInstance().getBluemixAppRoute() +
+                        "\nPlease verify your Application Route and rebuild the app.";
+            } else {
+                errorMessage += response.toString() + "\n";
+            }
         }
+
+        if (t != null) {
+            if (t.getClass().equals(UnknownHostException.class)) {
+                errorMessage = "Unable to access Bluemix host!\nPlease verify internet connectivity and try again.";
+            } else {
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                t.printStackTrace(pw);
+                errorMessage += "THROWN" + sw.toString() + "\n";
+            }
+        }
+
+        if (extendedInfo != null){
+            errorMessage += "EXTENDED_INFO" + extendedInfo.toString() + "\n";
+        }
+
+        if (errorMessage.isEmpty())
+            errorMessage = "Request Failed With Unknown Error.";
+
+        Log.e(TAG, "Failed to authenticate against MCA: " + errorMessage);
 
     }
 
@@ -281,17 +310,29 @@ public class MainActivity extends Activity implements ResponseListener {
             // On failure, log errors
             @Override
             public void onFailure(Response response, Throwable t, JSONObject extendedInfo) {
+
+                String errorMessage = "";
+
                 if (response != null) {
-                    Log.e(TAG, "Notify all devices failed with response: " + response.getResponseText());
+                    errorMessage += response.toString() + "\n";
                 }
+
                 if (t != null) {
-                    Log.e(TAG, "Notify all devices failed with error: " + t.getLocalizedMessage(), t);
+                    StringWriter sw = new StringWriter();
+                    PrintWriter pw = new PrintWriter(sw);
+                    t.printStackTrace(pw);
+                    errorMessage += "THROWN" + sw.toString() + "\n";
                 }
-                if (extendedInfo != null) {
-                    Log.e(TAG, "Notify all devices failed with: " + extendedInfo.toString());
-                }else{
-                    Log.e(TAG, "Notify all devices failed with reason unknown");
+
+                if (extendedInfo != null){
+                    errorMessage += "EXTENDED_INFO" + extendedInfo.toString() + "\n";
                 }
+
+                if (errorMessage.isEmpty())
+                    errorMessage = "Request Failed With Unknown Error.";
+
+                Log.e(TAG, "notifyAllDevices failed with error: " + errorMessage);
+
             }
         });
     }
@@ -337,15 +378,28 @@ public class MainActivity extends Activity implements ResponseListener {
                     @Override
                     public void onFailure(Response response, Throwable t, JSONObject extendedInfo) {
 
-                        if (t != null) {
-                            Log.e(TAG, "deleteItem failed with error: " + t.getLocalizedMessage());
-                        } if (response != null) {
-                            Log.e(TAG, "deleteItem failed with error: " + response.toString());
-                        } if (extendedInfo != null) {
-                            Log.e(TAG, "deleteItem failed with error: " + extendedInfo.toString());
-                        } else {
-                            Log.e(TAG, "deleteItem failed, reason Unkown");
+                        String errorMessage = "";
+
+                        if (response != null) {
+                            errorMessage += response.toString() + "\n";
                         }
+
+                        if (t != null) {
+                            StringWriter sw = new StringWriter();
+                            PrintWriter pw = new PrintWriter(sw);
+                            t.printStackTrace(pw);
+                            errorMessage += "THROWN" + sw.toString() + "\n";
+                        }
+
+                        if (extendedInfo != null){
+                            errorMessage += "EXTENDED_INFO" + extendedInfo.toString() + "\n";
+                        }
+
+                        if (errorMessage.isEmpty())
+                            errorMessage = "Request Failed With Unknown Error.";
+
+                        Log.e(TAG, "deleteItem failed with error: " + errorMessage);
+
 
                     }
                 });
@@ -422,18 +476,28 @@ public class MainActivity extends Activity implements ResponseListener {
 
             // Log Errors on failure
             @Override
-            public void onFailure(Response response, Throwable throwable, JSONObject jsonObject) {
-                if (throwable != null) {
-                    Log.e(TAG, "Failed sending loadList request to Bluemix: " + throwable.getLocalizedMessage());
-                }
+            public void onFailure(Response response, Throwable t, JSONObject extendedInfo) {
+                String errorMessage = "";
+
                 if (response != null) {
-                    Log.e(TAG, "Failed sending loadList request to Bluemix: " + response.toString());
+                    errorMessage += response.toString() + "\n";
                 }
-                if (jsonObject != null) {
-                    Log.e(TAG, "Failed sending loadList request to Bluemix: " + jsonObject.toString());
-                } else {
-                    Log.e(TAG, "Failed sending loadList request to Bluemix, reason unkown");
+
+                if (t != null) {
+                    StringWriter sw = new StringWriter();
+                    PrintWriter pw = new PrintWriter(sw);
+                    t.printStackTrace(pw);
+                    errorMessage += "THROWN" + sw.toString() + "\n";
                 }
+
+                if (extendedInfo != null){
+                    errorMessage += "EXTENDED_INFO" + extendedInfo.toString() + "\n";
+                }
+
+                if (errorMessage.isEmpty())
+                    errorMessage = "Request Failed With Unknown Error.";
+
+                Log.e(TAG, "loadList failed with error: " + errorMessage);
             }
         });
 
@@ -497,18 +561,27 @@ public class MainActivity extends Activity implements ResponseListener {
                         // On failure, log errors
                         @Override
                         public void onFailure(Response response, Throwable t, JSONObject extendedInfo) {
+                            String errorMessage = "";
+
                             if (response != null) {
-                                Log.e(TAG, "createItem failed with error: " + response.getResponseText());
-                            }
-                            if (t != null) {
-                                Log.e(TAG, "createItem failed with error: " + t.getLocalizedMessage(), t);
-                            }
-                            if (extendedInfo != null) {
-                                Log.e(TAG, "createItem failed with error: " + extendedInfo.toString());
-                            }else{
-                                Log.e(TAG, "createItem failed, reason unknown");
+                                errorMessage += response.toString() + "\n";
                             }
 
+                            if (t != null) {
+                                StringWriter sw = new StringWriter();
+                                PrintWriter pw = new PrintWriter(sw);
+                                t.printStackTrace(pw);
+                                errorMessage += "THROWN" + sw.toString() + "\n";
+                            }
+
+                            if (extendedInfo != null){
+                                errorMessage += "EXTENDED_INFO" + extendedInfo.toString() + "\n";
+                            }
+
+                            if (errorMessage.isEmpty())
+                                errorMessage = "Request Failed With Unknown Error.";
+
+                            Log.e(TAG, "createItem failed with error: " + errorMessage);
                         }
                     });
                 }
@@ -577,7 +650,7 @@ public class MainActivity extends Activity implements ResponseListener {
                         // On success, update local list with updated TodoItem
                         @Override
                         public void onSuccess(Response response) {
-                            Log.i("MainActivity", "Item updated successfully");
+                            Log.i(TAG, "Item updated successfully");
 
                             loadList();
                         }
@@ -585,18 +658,27 @@ public class MainActivity extends Activity implements ResponseListener {
                         // On failure, log errors
                         @Override
                         public void onFailure(Response response, Throwable t, JSONObject extendedInfo) {
+                            String errorMessage = "";
+
                             if (response != null) {
-                                Log.e(TAG, "updateItem failed with error: " + response.getResponseText());
-                            }
-                            if (t != null) {
-                                Log.e(TAG, "updateItem failed with error: " + t.getLocalizedMessage(), t);
-                            }
-                            if (extendedInfo != null) {
-                                Log.e(TAG, "updateItem failed with error: " + extendedInfo.toString());
-                            }else{
-                                Log.e(TAG, "updateItem failed, reason unknown");
+                                errorMessage += response.toString() + "\n";
                             }
 
+                            if (t != null) {
+                                StringWriter sw = new StringWriter();
+                                PrintWriter pw = new PrintWriter(sw);
+                                t.printStackTrace(pw);
+                                errorMessage += "THROWN" + sw.toString() + "\n";
+                            }
+
+                            if (extendedInfo != null){
+                                errorMessage += "EXTENDED_INFO" + extendedInfo.toString() + "\n";
+                            }
+
+                            if (errorMessage.isEmpty())
+                                errorMessage = "Request Failed With Unknown Error.";
+
+                            Log.e(TAG, "editTodoName failed with error: " + errorMessage);
                         }
                     });
 
@@ -651,17 +733,27 @@ public class MainActivity extends Activity implements ResponseListener {
             // On failure, log errors
             @Override
             public void onFailure(Response response, Throwable t, JSONObject extendedInfo) {
+                String errorMessage = "";
+
                 if (response != null) {
-                    Log.e(TAG, "isDoneToggle failed with error: " + response.getResponseText());
+                    errorMessage += response.toString() + "\n";
                 }
+
                 if (t != null) {
-                    Log.e(TAG, "isDoneToggle failed with error: " + t.getLocalizedMessage(), t);
+                    StringWriter sw = new StringWriter();
+                    PrintWriter pw = new PrintWriter(sw);
+                    t.printStackTrace(pw);
+                    errorMessage += "THROWN" + sw.toString() + "\n";
                 }
-                if (extendedInfo != null) {
-                    Log.e(TAG, "isDoneToggle failed with error: " + extendedInfo.toString());
-                } else {
-                    Log.e(TAG, "isDoneToggle failed, reason unknown");
+
+                if (extendedInfo != null){
+                    errorMessage += "EXTENDED_INFO" + extendedInfo.toString() + "\n";
                 }
+
+                if (errorMessage.isEmpty())
+                    errorMessage = "Request Failed With Unknown Error.";
+
+                Log.e(TAG, "isDoneToggle failed with error: " + errorMessage);
             }
         });
 
