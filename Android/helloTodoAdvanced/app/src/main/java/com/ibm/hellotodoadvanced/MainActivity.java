@@ -83,7 +83,7 @@ public class MainActivity extends Activity implements ResponseListener {
             //initialize SDK with IBM Bluemix application ID and route
             //You can find your backendRoute and backendGUID in the Mobile Options section on top of your Bluemix application dashboard
             //TODO: Please replace <APPLICATION_ROUTE> with a valid ApplicationRoute and <APPLICATION_ID> with a valid ApplicationId
-            client.initialize(this, "<APPLICATION_ROUTE>", "<APPLICATION_ID>");
+            client.initialize(this, "http://drctest.mybluemix.net", "a0214805-e7b1-4b43-880d-2f1c8bb8bf74");
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
@@ -217,6 +217,7 @@ public class MainActivity extends Activity implements ResponseListener {
 
             @Override
             public void onFailure(MFPPushException e) {
+                e.
                 Log.e(TAG,"Failed to register for notifications: " + e.getErrorMessage());
                 // Set null on failure so the sdk does not need to hold notifications
                 push = null;
