@@ -1,6 +1,6 @@
 # helloTodoAdvanced sample application for Bluemix Mobile Services
 ---
-This helloTodoAdvanced sample app contains an Objective-C project, an Android project, and a Node.js application that communicates with a StrongLoop-based mobile backend created with the MobileFirst&trade; Services Starter Boilerplate on IBM&reg; Bluemix&reg;. The sample extends the helloTodo application to include:
+This helloTodoAdvanced sample app contains an Objective-C project, an Android project, a Cordova project, and a Node.js application that communicates with a StrongLoop-based mobile backend created with the MobileFirst&trade; Services Starter Boilerplate on IBM&reg; Bluemix&reg;. The sample extends the helloTodo application to include:
 * Authentication with the IBM Mobile Client Access for Bluemix service and Facebook identity provider.
 * Node.js modification to securely send push notifications with the IBM Push Notifications for Bluemix service.
 
@@ -8,22 +8,26 @@ This helloTodoAdvanced sample app contains an Objective-C project, an Android pr
   Before you start, make sure that you have:
  * A [Bluemix](http://bluemix.net) account  
  * [Cloud Foundry CLI](https://github.com/cloudfoundry/cli/releases)
- * Facebook Developer Application. 
- [Learn more about using Facebook as an identity provider](https://www.bluemix.net/docs/services/mobileaccess/facebook-auth-overview.html)
- 
- 
+ * Facebook Developer Application.
+ [Learn more about using Facebook as an identity provider](https://www.ng.bluemix.net/docs/services/mobileaccess/security/facebook/t_fb_config.html)
+
+
 **iOS:**  
 * XCode Version 7.1
 * Physical iOS device
 * Properly Configured APNs Artifacts. To create and configure your APNs credentials, follow the instructions at  
-[Creating and configuring push credentials for APNs](https://www.bluemix.net/docs/services/mobilepush/t_push_provider_ios.html)
+[Creating and configuring push credentials for APNs](https://www.ng.bluemix.net/docs/services/mobilepush/t_push_config_provider_ios.html)
 
 > **Note:** For push notifications to work successfully, you must run the helloTodoAdvanced sample on a physical iOS device with a valid APNs enabled bundle id, provisioning profile, and development certificate.
- 
+
 **Android:**  
 * Android Studio
 * Google Cloud Messaging (GCM) credentials. To obtain your GCM credentials, follow the instructions at  
-[configuring push credentials for GCM](https://www.bluemix.net/docs/services/mobilepush/t_push_provider_android.html).
+[configuring push credentials for GCM](https://www.ng.bluemix.net/docs/services/mobilepush/t_push_config_provider_android.html).
+
+**Cordova:**  
+* Cordova Version 6.0.0
+* Necessary native platform requirements for iOS and Android
 
 ## Configuring the helloTodoAdvanced sample
 
@@ -40,7 +44,7 @@ Use the following steps to configure the helloTodo-Advanced sample:
 
 ### Download the helloTodoAdvanced sample
 Clone the sample from GitHub with the following command:  
-  
+
 `
 git clone https://github.com/ibm-bluemix-mobile-services/bms-samples-hellotodo-advanced
 `
@@ -91,6 +95,9 @@ The mobile backend is protected by Mobile Client Access by default.  Mobile Clie
 1. In the Push Notifications dashboard, go to the **Configuration** tab to configure your Push Notification service.  
 2. Scroll down to the **Google Cloud Messaging** section. Enter your GCM project credentials, project number (Sender ID) and API key, and click **Save**.  
 
+#### Cordova:
+Follow the iOS or Android instructions depending on the native platform you are configuring.
+
 ### Deploy the custom Node application to Bluemix
 
 The helloTodoAdvanced sample application requires custom code to be deployed to the Node.js application running on Bluemix. This code:
@@ -103,10 +110,11 @@ To learn more about this custom code, you can view the source: [Custom Node.js c
 2. Edit the `manifest.yml` file and add the services section. Add the Mobile Client Access service instance name that you created in previous steps. For example:  
 ![manifest](manifest.png)  ![MCAAppName](MCAAppName.png)  
 3. After logging in to Bluemix using the command `cf login -a https://api.region.bluemix.net` (where region is either ng, eu-gb, or au-syd) navigate to the NodeJS directory. Run the `cf push your_Bluemix_app_name` command to deploy your application to Bluemix which will bind the custom Node.js code to the Mobile Client Access service instance and start the app.
-4. If done correctly, you should now have the updated Node.js app running in your Bluemix environment. The
-screenshot below shows an instance that has started successfully:
-![cfpushstarted](cfpushstarted.png)
-5. Your Bluemix application is now available at: `https//{hostname-from-manifest.yml}.region.mybluemix.net`
+
+4. When deployment completes, use the `cf apps` command to see the list of available applications and their routes.
+
+5. Your Bluemix application is available at: `https//{hostname-from-manifest.yml}.mybluemix.net`
+
 
 
 ### Configure the front end in the helloTodoAdvanced sample
@@ -132,7 +140,7 @@ IMFClient *imfClient = [IMFClient sharedInstance];
 return YES;
 }
 ```
->Note: With the new Application Transport Security introduced in iOS9, it is recommended to configure your application to connect to the secure Https Bluemix endpoint (Https://{Application_Name}.mybluemix.net) 
+>Note: With the new Application Transport Security introduced in iOS9, it is recommended to configure your application to connect to the secure Https Bluemix endpoint (Https://{Application_Name}.mybluemix.net)
 
 #### Android:  
 
@@ -165,6 +173,45 @@ return YES;
 
 > **Note**: This sample depends on 1.+ version of the Core SDK. The most recent 1.* version will be downloaded automatically. When you are creating a production applications, define the version explicitly (1.0.0 for example) to ensure consistent builds.
 
+#### Cordova:  
+
+In a terminal, navigate to the `bms-samples-hellotodo-advanced` directory where the project was cloned and navigate to the `Cordova` folder.  
+
+##### Add the native platforms to your app
+
+```Bash
+cordova platform add ios
+cordova platform add android
+```
+
+##### Add the plugin:
+
+```Bash
+cordova plugin add ibm-mfp-push
+```
+
+##### Configure Cordova
+
+Follow the README instructions for [Configuration](https://github.com/ibm-bluemix-mobile-services/bms-clientsdk-cordova-plugin-core/#4-configuring-your-platform) to configure your development environment.
+
+***Note: Project will not build until you follow instructions from this step***
+
+##### Configure the front end in the helloTodoAdvanced sample
+
+1. Navigate to the directory where the project was cloned.
+2. Open <b>index.js</b> located at [your-directory]/www/js/index.js
+3. Replace the \<APPLICATION_ROUTE\> and \<APPLICATION_GUID\> with your Bluemix application ID and route.
+4. Make sure your route is using **https**
+
+JavaScript:
+
+```JavaScript
+// Bluemix credentials
+route: "<APPLICATION_ROUTE>",
+guid: "<APPLICATION_GUID>",
+```
+
+***Note: Don't forget commas at the end of each line!***
 
 ### Setting up Facebook authentication
 
@@ -178,15 +225,17 @@ Update URL Types, Item 0, URL Schemes, update Item 0 as follows:
 
 - **URL Schemes**: (for example `fb1581349575427190` , fb+Client ID from Facebook developer console)  
 
-For more information about using Facebook as an identity provider, see [Enabling Facebook authentication in iOS apps](https://www.bluemix.net/docs/services/mobileaccess/facebook-auth-ios.html).
+For more information about using Facebook as an identity provider, see [Enabling Facebook authentication in iOS apps](https://www.ng.bluemix.net/docs/services/mobileaccess/facebook-auth-ios.html).
 
 #### Android:
 
 1. Navigate to the `strings.xml` file, in the  `Android\helloTodoAdvanced\bluelist\app\src\main\res\values\` directory. Replace `Your_Facebook_App_Id` with the appID from the Facebook application you created.
 1. Verify that your Google Play package name in your Facebook app is `com.ibm.helloTodoAdvanced` and that your class name is `com.ibm.helloTodoAdvanced.MainActivity`.
 
-For more information about using Facebook as an identity provider, see [Enabling Facebook authentication in Android apps](https://www.bluemix.net/docs/services/mobileaccess/facebook-auth-android.html).
+For more information about using Facebook as an identity provider, see [Enabling Facebook authentication in Android apps](https://www.ng.bluemix.net/docs/services/mobileaccess/facebook-auth-android.html).
 
+#### Cordova:
+In order to configure Cordova applications for Facebook authentication integration you will need to make changes in native code of the Cordova application, i.e. Java, Objective-C, or Swift. Each platform needs to be configured separately. See the [Cordova HelloAuthentication sample](https://github.com/ibm-bluemix-mobile-services/bms-samples-cordova-helloauthentication) for detailed instructions of how to configure each platform. After a one-time completion of the native configuration, development of the JavaScript should be able to be done independent of the platform. If the native platform is removed from Cordova at any time, you will have to add the Facebook authentication back in again.
 
 ### Run the helloTodoAdvanced sample application
 
@@ -195,6 +244,21 @@ In Xcode, click **Product > Run**.
 
 #### Android:  
 In Android Studio click **Run** and select a device.
+
+#### Cordova:
+Now you can run your application in your mobile emulator or on your device.
+
+1. Build the Cordova app. From your terminal enter the following command:
+
+		cordova build ios
+		cordova build android
+
+2. Run the sample app. From your terminal enter the following command:
+
+		cordova run ios
+		cordova run android		
+
+**Note:** Make sure you have configured Facebook authentication by following the instructions in the [Cordova HelloAuthentication sample](https://github.com/ibm-bluemix-mobile-services/bms-samples-cordova-helloauthentication) before running the application. Otherwise, the app will return "Unauthorized."
 
 #### View your data in the app
 The helloTodoAdvanced sample is a single view application with a simple list of to do items. If you previously added data through your web application, you will see the data is automatically pulled into the application.  
