@@ -216,6 +216,8 @@ For more information about using Facebook as an identity provider, see [Enabling
 
 For more information about using Facebook as an identity provider, see [Enabling Facebook authentication in Android apps](https://www.bluemix.net/docs/services/mobileaccess/facebook-auth-android.html).
 
+#### Cordova:
+In order to configure Cordova applications for Facebook authentication integration you will need to make changes in native code of the Cordova application, i.e. Java, Objective-C, or Swift. Each platform needs to be configured separately. See the [Cordova HelloAuthentication sample](https://github.com/ibm-bluemix-mobile-services/bms-samples-cordova-helloauthentication) for detailed instructions of how to configure each platform. After a one-time completion of the native configuration, development of the JavaScript should be able to be done independent of the platform. If the native platform is removed from Cordova at any time, you will have to add the Facebook authentication back in again.
 
 ### Run the helloTodoAdvanced sample application
 
@@ -226,7 +228,19 @@ In Xcode, click **Product > Run**.
 In Android Studio click **Run** and select a device.
 
 #### Cordova:
-In order to configure Cordova applications for Facebook authentication integration you will need to make changes in native code of the Cordova application, i.e. Java, Objective-C, or Swift. Each platform needs to be configured separately. See the [Cordova HelloAuthentication sample](https://github.com/ibm-bluemix-mobile-services/bms-samples-cordova-helloauthentication) for detailed instructions of how to configure each platform. After a one-time completion of the native configuration, development of the JavaScript should be able to be done independent of the platform. If the native platform is removed from Cordova at any time, you will have to add the Facebook authentication back in again.
+Now you can run your application in your mobile emulator or on your device.
+
+1. Build the Cordova app. From your terminal enter the following command:
+
+		cordova build ios
+		cordova build android
+
+2. Run the sample app. From your terminal enter the following command:
+
+		cordova run ios
+		cordova run android		
+
+**Note:** Make sure you have configured Facebook authentication by following the instructions in the [Cordova HelloAuthentication sample](https://github.com/ibm-bluemix-mobile-services/bms-samples-cordova-helloauthentication) before running the application. Otherwise, the app will return "Unauthorized."
 
 #### View your data in the app
 The helloTodoAdvanced sample is a single view application with a simple list of to do items. If you previously added data through your web application, you will see the data is automatically pulled into the application.  
