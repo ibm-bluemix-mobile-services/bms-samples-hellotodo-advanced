@@ -179,7 +179,7 @@ In a terminal, navigate to the `bms-samples-hellotodo-advanced` directory where 
 ##### Add the native platforms to your app
 
 ```Bash
-cordova platform add ios
+cordova platform add ios@3.9.0
 cordova platform add android
 ```
 
