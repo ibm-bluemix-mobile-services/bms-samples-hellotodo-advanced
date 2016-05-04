@@ -32,7 +32,7 @@ import java.util.List;
  */
 public class TodoItemAdapter extends BaseAdapter implements ListAdapter{
 
-    private static final String TAG = TodoItemAdapter.class.getCanonicalName();
+    // Neccessary adapter values
     private List<TodoItem> mTodoItems;
     private Context mContext;
 
@@ -94,11 +94,16 @@ public class TodoItemAdapter extends BaseAdapter implements ListAdapter{
         return convertView;
     }
 
+    /**
+     * Return image resource id based on boolean parameter
+     * @param isDone, if true return check image, if false return empty circle
+     * @return appropriate image resource id
+     */
     private int getDoneImageResourceId(boolean isDone) {
         if (isDone) {
-            return R.mipmap.confirm;
+            return R.mipmap.complete;
         }else {
-            return R.mipmap.low;
+            return R.mipmap.incomplete;
         }
     }
 }

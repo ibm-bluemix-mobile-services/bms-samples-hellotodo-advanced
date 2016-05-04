@@ -17,7 +17,7 @@ package com.ibm.hellotodoadvanced;
  */
 
 /**
- * Simple and publicly accessable TodoItem class
+ * Simple and publicly accessible TodoItem class
  */
 
 public class TodoItem {
