@@ -95,11 +95,6 @@ public class MainActivity extends Activity implements ResponseListener {
             throw new RuntimeException(exception);
         }
 
-        // Runtime Permission handling required for SDK 23+
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.GET_ACCOUNTS) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.GET_ACCOUNTS}, PERMISSION_REQUEST_GET_ACCOUNTS);
-        }
-
         //initialize UI
         initListView();
         initSwipeRefresh();
@@ -131,7 +126,7 @@ public class MainActivity extends Activity implements ResponseListener {
                 // Grab TodoItem to delete from current showing list
                 TodoItem todoItem = mTodoItemList.get(position);
 
-                // Grab TodoItem id number and append to the DELETE rest request using the Bluemix Mobile Services Client SDK
+                // Grab TodoItem id number and append to the DELETE REST request using the Bluemix Mobile Services Client SDK
                 String todoId = Integer.toString(todoItem.idNumber);
                 Request request = new Request(bmsClient.getBluemixAppRoute() + "/api/Items/" + todoId, Request.DELETE);
 
@@ -188,7 +183,7 @@ public class MainActivity extends Activity implements ResponseListener {
 
         mSwipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
 
-        // Set swipe refresh listener to update the local list on pull down
+        // Set swipe refresh listener to update the local list on swipe down
         mSwipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -230,22 +225,6 @@ public class MainActivity extends Activity implements ResponseListener {
         };
     }
 
-    // Necessary override for Runtime Permission Handling required for SDK 23+
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case PERMISSION_REQUEST_GET_ACCOUNTS: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.i(TAG, "Permisssions for Android 23+ fully enabled");
-
-                } else {
-                    Log.e(TAG, "Unable to authorize without full permissions. \nPlease retry with permissions enabled.");
-                }
-                return;
-            }
-        }
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -262,13 +241,13 @@ public class MainActivity extends Activity implements ResponseListener {
         // Register this activity to handle Facebook auth response using the ResponseListener interface
         FacebookAuthenticationManager.getInstance().register(this);
 
-        // Obtaining an authorization header kicks off the Facebook login process. If successful, the onSuccess() function is called and the authorization header is cached to be used on outbound requests.
-        // Note: if no auth is configured in the Bluemix MCA instance, this auth will succeed automatically since it only checks that the request is coming from a Bluemix Mobile Services core SDK.
+        // Attempting to obtain an authorization header kicks off the Facebook login process. If successful, the onSuccess() function is called and the authorization header is cached to be used on outbound requests.
+        // Note: if no auth is configured in the Bluemix MCA instance, the authentication will succeed automatically since it only checks that the request is coming from a Bluemix Mobile Services core SDK.
         AuthorizationManager.getInstance().obtainAuthorizationHeader(this, this);
     }
 
     /**
-     * Handles successful authentication against MCA. If facebook auth is required, this will be called upon successful login.
+     * Handles successful authentication against MCA.
      * @param response HTTP response object from MCA.
      */
     @Override
@@ -339,7 +318,7 @@ public class MainActivity extends Activity implements ResponseListener {
                             mTodoItemList.add(tempTodo);
                         }
 
-                        // Need to update adapter on main thread in order for list changes to update visually
+                        // Need to notify adapter on main thread in order for list changes to update visually
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -389,7 +368,8 @@ public class MainActivity extends Activity implements ResponseListener {
     }
 
     /**
-     * Handles response from Bluemix MCA, kicks off the Facebook login intent, and routes appropriately, this should always be the same depending on the form of auth (Facebook auth manager vs Google auth manager etc...).
+     * Hands off result code from Facebook login activity to Facebook SDK to verify login
+     * This override is required for each form of auth (Facebook auth manager vs Google auth manager etc...).
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -399,7 +379,7 @@ public class MainActivity extends Activity implements ResponseListener {
     }
 
     /**
-     * Clears list data, if any, when authentication against MCA fails and logs errors/response.
+     * Clears list data when authentication against MCA fails and logs errors/response.
      * @param response HTTP response object from MCA
      */
     @Override
@@ -553,20 +533,19 @@ public class MainActivity extends Activity implements ResponseListener {
             textView.setGravity(Gravity.CENTER);
         }
         editDialog.setCancelable(true);
-        EditText et = (EditText) editDialog.findViewById(R.id.todo);
+        EditText currentText = (EditText) editDialog.findViewById(R.id.todo);
 
         // Get selected TodoItem values
         final String name = mTodoItemList.get(position).text;
         final boolean isDone = mTodoItemList.get(position).isDone;
         final int id = mTodoItemList.get(position).idNumber;
-        et.setText(name);
+        currentText.setText(name);
 
         Button editDone = (Button) editDialog.findViewById(R.id.Add);
         editDialog.show();
 
         // When done is pressed, send PUT request to update TodoItem on Bluemix
         editDone.setOnClickListener(new View.OnClickListener() {
-            // Save text inputted when done is tapped
             @Override
             public void onClick(View view) {
                 EditText editedText = (EditText) editDialog.findViewById(R.id.todo);
@@ -636,7 +615,7 @@ public class MainActivity extends Activity implements ResponseListener {
     /**
      * When TodoItem image is tapped, switch boolean isDone value to indicate current completion status.
      * The TodoItem is updated on Bluemix and then the list is refreshed to reflect new status.
-     * Calls notifyAllDevices if an item is successfully completed. Uses same REST request as editTodoName.
+     * Calls notifyAllDevices if an item is successfully completed.
      *
      * @param view The TodoItem that has been tapped.
      */
@@ -664,7 +643,7 @@ public class MainActivity extends Activity implements ResponseListener {
         request.setHeaders(headers);
 
         request.send(getApplicationContext(), json, new ResponseListener() {
-            // On success, update local list with updated TodoItem, and call notifyAllDevices of marked complete.
+            // On success, update local list with updated TodoItem, and call notifyAllDevices if marked complete.
             @Override
             public void onSuccess(Response response) {
                 Log.i(TAG, todoItem.text + " completeness updated successfully");
