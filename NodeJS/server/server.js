@@ -24,7 +24,7 @@ try {
 	
 	}catch (e) {
         console.error("Error encountered while obtaining Bluemix service credentials." +
-            " Make certain that the Mobile Client Access and imfPush service are bound to this application." +
+            " Make certain that the Mobile Client Access and IBM Push Notifications service are bound to this application." +
             " Error: " + e);
     }
 
@@ -42,15 +42,15 @@ passport.use(new MCABackendStrategy())
 // Tell application to use passport
 app.use(passport.initialize());
 
-// Protect DELETE endpoint so it can only be accessed by the Bluemix Mobile Services client SDK.
+// Protected DELETE endpoint that uses our MCA backend strategy as the authentication mechanism.  This ensures that only authenticated Bluemix Mobile Services client SDKs can access the endpoint.
 app.delete('/api/Items/:id', passport.authenticate('mca-backend-strategy', {session: false}));
 
-// Protected GET endpoint which is used in the authentication process for Bluemix Mobile Services tutorials
+// Protected GET endpoint which is used in the authentication process for Bluemix Mobile Services tutorials.
 app.get('/protected', passport.authenticate('mca-backend-strategy', {session: false}), function(req, res){
 	res.send("Hello, this is a protected resource of the mobile backend application!");
 });
 
-// Protected POST endpoint which allows us to send push notifications. You should protect this endpoint to ensure malicious users do not send unwanted push notifications
+// Protected POST endpoint which allows us to send push notifications. You should protect this endpoint to ensure malicious users do not send unwanted push notifications.
 app.post('/notifyAllDevices', passport.authenticate('mca-backend-strategy', {session: false}), function(req, res){
 	
 	// Create JSON body to include the completed task in push notification.
@@ -78,12 +78,12 @@ app.post('/notifyAllDevices', passport.authenticate('mca-backend-strategy', {ses
 		}else if(error){
 			// If an error occurred log and send to mobile app
 			console.log("Error from Push Service: " + error);
-			res.status(response.statusCode).send({reason: "An error occurred while sending the Push notification.", error: error});
+			res.status(response.statusCode).send({reason: "An error occurred while sending the push notification.", error: error});
 		}else{
 			// if no error but something else goes wrong, like no devices are registered, print response and send body to mobile app
 			console.log("An unknown problem occurred, printing response");
 			console.log(response);
-			res.status(response.statusCode).send({reason: "A problem occurred while sending the Push notification.", message: body});
+			res.status(response.statusCode).send({reason: "A problem occurred while sending the push notification.", message: body});
 		}
 		
 	}); 
