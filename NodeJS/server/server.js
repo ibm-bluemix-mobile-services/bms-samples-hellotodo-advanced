@@ -42,15 +42,15 @@ passport.use(new MCABackendStrategy())
 // Tell application to use passport
 app.use(passport.initialize());
 
-// Protect DELETE endpoint so it can only be accessed by HelloTodo mobile samples
+// Protect DELETE endpoint so it can only be accessed by the Bluemix Mobile Services client SDK.
 app.delete('/api/Items/:id', passport.authenticate('mca-backend-strategy', {session: false}));
 
-// Protect /protected endpoint which is used in Getting Started with Bluemix Mobile Services tutorials
+// Protected GET endpoint which is used in the authentication process for Bluemix Mobile Services tutorials
 app.get('/protected', passport.authenticate('mca-backend-strategy', {session: false}), function(req, res){
 	res.send("Hello, this is a protected resource of the mobile backend application!");
 });
 
-// Protect /notifyAllDevices from malicious users who want to send tons of push notifications
+// Protected POST endpoint which allows us to send push notifications. You should protect this endpoint to ensure malicious users do not send unwanted push notifications
 app.post('/notifyAllDevices', passport.authenticate('mca-backend-strategy', {session: false}), function(req, res){
 	
 	// Create JSON body to include the completed task in push notification.
