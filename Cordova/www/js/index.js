@@ -43,25 +43,29 @@ var app =  {
   //
   // The scope of 'this' is the event. In order to use the 'route' and 'guid'
   // variables, we must explicitly call 'app.route' and 'app.guid'
+  //
+  // Attempting to obtain an authorization header kicks off the Facebook login process
+  // On success, the authSuccess function will be called and on failure, the authFailure function will be called
+  // Note: if no auth is configured in the Bluemix MCA instance, the authentication will succeed automatically since it only checks that the request is coming from a Bluemix Mobile Services core SDK
   onDeviceReady: function() {
     BMSClient.initialize(app.route, app.guid);
     MFPAuthorizationManager.obtainAuthorizationHeader(app.authSuccess, app.authFailure);
   },
 
-  // Make a call to our API to get all Items.
-  // Update the table with the items
+  // Make a call to our API to get all items
+  // Update the table with the items on success
   getItems: function() {
     api.getItems(app.apiRoute, view.refreshTable, app.failure);
   },
 
   // Make a call to our API to add a new item
-  // Update the table with the new items
+  // Update the table with the new items on success
   addItem: function() {
     api.addItem(app.apiRoute, app.getItems, app.failure);
   },
 
   // Make a call to our API to update a specific item
-  // Update the table with the items
+  // Update the table with the items on success
   updateItem: function(id) {
     api.setItem(app.apiRoute, id, view.updateItem(id, false), app.failure);
     api.notifyAllDevices(app.route, view.returnTextContent(id), view.returnCheckContent(id), app.notificationSuccess, app.failure);
@@ -101,7 +105,7 @@ var app =  {
     MFPPush.registerDevice(settings, app.registeredPushSuccess, app.failure);
   },
 
-  // Register for PUSH and get the items if MCA is successful
+  // Register for PUSH and gets the items if MCA successfully authorizes
   authSuccess: function() {
     app.registerPush();
     app.apiRoute = app.route + app.apiRoute;
